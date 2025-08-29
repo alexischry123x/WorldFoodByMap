@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import cyFlag from "../assets/cy.png"; // adjust the path to match your folder structure
+import cyFlag from "../assets/cy.png";
 
 interface Village {
   id: string;
@@ -31,7 +31,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -45,59 +44,38 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     <div className="relative w-full max-w-6xl mx-auto">
       {/* Title */}
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
-  <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
-  <span>Cyprus Food Map</span>
-</h1>
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white flex">
-        {/* Left info panel on web */}
-        {!isMobile && (
-          <div className="w-1/6 p-6 flex flex-col justify-center text-white text-center bg-gradient-to-b from-blue-400 via-blue-300 to-green-300 rounded-l-2xl">
-            <h2 className="font-bold mb-2 text-lg">Handpicked Quality</h2>
-            <p className="text-sm">
-              All items are personally selected by us directly from the villages, ensuring the best quality and proper quantity.
-            </p>
-          </div>
-        )}
+        <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
+        <span>Cyprus Food Map</span>
+      </h1>
 
-        {/* Map */}
-        <div className="flex-1">
-          <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={isMobile ? mobileCenter : webCenter}
-              zoom={isMobile ? 9 : 10}
-              onLoad={handleMapLoad}
-            >
-              {mapLoaded &&
-                villages.map((village) => {
-                  const foodPin = {
-                    url: "/logo.png",
-                    scaledSize: new window.google.maps.Size(40, 40),
-                    anchor: new window.google.maps.Point(20, 40),
-                  };
+      {/* Map */}
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={isMobile ? mobileCenter : webCenter}
+            zoom={isMobile ? 9 : 10}
+            onLoad={handleMapLoad}
+          >
+            {mapLoaded &&
+              villages.map((village) => {
+                const foodPin = {
+                  url: "/logo.png",
+                  scaledSize: new window.google.maps.Size(40, 40),
+                  anchor: new window.google.maps.Point(20, 40),
+                };
 
-                  return (
-                    <Marker
-                      key={village.id}
-                      position={{ lat: village.lat, lng: village.lng }}
-                      onClick={() => onVillageClick(village)}
-                      icon={foodPin}
-                    />
-                  );
-                })}
-            </GoogleMap>
-          </LoadScript>
-        </div>
-
-        {/* Right info panel on web */}
-        {!isMobile && (
-          <div className="w-1/6 p-6 flex flex-col justify-center text-white text-center bg-gradient-to-b from-blue-400 via-blue-300 to-green-300 rounded-r-2xl">
-            <h2 className="font-bold mb-2 text-lg">Authentic Experience</h2>
-            <p className="text-sm">
-              Visit villages virtually, learn their stories, and get products crafted by local artisans.
-            </p>
-          </div>
-        )}
+                return (
+                  <Marker
+                    key={village.id}
+                    position={{ lat: village.lat, lng: village.lng }}
+                    onClick={() => onVillageClick(village)}
+                    icon={foodPin}
+                  />
+                );
+              })}
+          </GoogleMap>
+        </LoadScript>
       </div>
 
       {/* Pins below the map */}
