@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
@@ -28,10 +29,9 @@ const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
-  // Detect mobile viewport
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -39,27 +39,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Create AdvancedMarkerElement markers
-  useEffect(() => {
-    if (!mapInstance) return;
-
-    villages.forEach((village) => {
-      const foodPin = {
-        url: "/logo.png",
-        scaledSize: new window.google.maps.Size(40, 40),
-        anchor: new window.google.maps.Point(20, 40),
-      };
-
-      const marker = new window.google.maps.marker.AdvancedMarkerElement({
-        position: { lat: village.lat, lng: village.lng },
-        map: mapInstance,
-        icon: foodPin,
-        title: village.name,
-      });
-
-      marker.addListener("click", () => onVillageClick(village));
-    });
-  }, [mapInstance, onVillageClick]);
+  const handleMapLoad = () => setMapLoaded(true);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -76,8 +56,25 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             mapContainerStyle={containerStyle}
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
-            onLoad={(map) => setMapInstance(map)}
-          />
+            onLoad={handleMapLoad}
+          >
+            {mapLoaded &&
+              villages.map((village) => {
+                const foodPin = {
+                  url: "/logo.png",
+                  scaledSize: new window.google.maps.Size(40, 40),
+                  anchor: new window.google.maps.Point(20, 40),
+                };
+                return (
+                  <Marker
+                    key={village.id}
+                    position={{ lat: village.lat, lng: village.lng }}
+                    onClick={() => onVillageClick(village)}
+                    icon={foodPin}
+                  />
+                );
+              })}
+          </GoogleMap>
         </LoadScript>
       </div>
 
