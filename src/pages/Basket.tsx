@@ -52,7 +52,7 @@ const Basket: React.FC = () => {
               <h2 className="text-xl font-bold">Total: €{totalPrice.toFixed(2)}</h2>
               <div className="space-x-2">
                 <Button
-                  onClick={clearCart}
+                  onClick={clearCart} //
                   className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
                 >
                   Clear Basket
