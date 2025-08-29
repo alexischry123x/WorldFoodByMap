@@ -42,7 +42,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             <GoogleMap
               mapContainerStyle={containerStyle}
               center={center}
-              zoom={9}
+              zoom={10}
               onLoad={handleMapLoad}
             >
               {mapLoaded &&
