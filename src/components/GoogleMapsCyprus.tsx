@@ -49,14 +49,16 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
-              {villages.map((village) => (
-                <Marker
-                  key={village.id}
-                  position={{ lat: village.lat, lng: village.lng }}
-                  onClick={() => onVillageClick(village)}
-                />
-              ))}
-            </GoogleMap>
+  {villages.map((village) => (
+    <Marker
+      key={village.id}
+      position={{ lat: village.lat, lng: village.lng }}
+      onClick={() => onVillageClick(village)}
+      icon={foodPin} // <-- this applies your custom logo
+    />
+  ))}
+</GoogleMap>
+
           </LoadScript>
         </div>
 
