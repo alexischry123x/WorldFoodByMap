@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import cyFlag from "../assets/cy.png"; // adjust the path to match your folder structure
 
 interface Village {
   id: string;
@@ -43,10 +44,10 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   return (
     <div className="relative w-full max-w-6xl mx-auto">
       {/* Title */}
-      <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg">
-        🇨🇾 Cyprus Food Map
-      </h1>
-
+      <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
+  <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
+  <span>Cyprus Food Map</span>
+</h1>
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white flex">
         {/* Left info panel on web */}
         {!isMobile && (
