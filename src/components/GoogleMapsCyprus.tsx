@@ -65,4 +65,24 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           {villages.map((village) => (
             <button
               key={village.id}
-              onClick={() => onVillageClick(v
+              onClick={() => onVillageClick(village)}
+              className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
+            >
+              <div className="text-2xl mb-2">📍</div>
+              <div className="font-bold text-gray-800">{village.name}</div>
+              <div className="text-sm text-gray-600">{village.product}</div>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-white text-lg font-medium drop-shadow">
+            Click on any village to discover authentic Cypriot products! 🏺
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GoogleMapsCyprus;
