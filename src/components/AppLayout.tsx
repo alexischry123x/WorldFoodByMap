@@ -2,7 +2,7 @@ import React from "react";
 import WorldFoodByMap from "./WorldFoodByMap";
 import { useCart } from "../components/CartContext";
 import { useNavigate } from "react-router-dom";
-import cyprusFlag from "../assets/cy.png";
+import { Globe } from "lucide-react"; // using lucide-react world icon
 
 const AppLayout: React.FC = () => {
   const { cart } = useCart();
@@ -13,14 +13,10 @@ const AppLayout: React.FC = () => {
   return (
     <div>
       {/* Header with Basket */}
-      <header className="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white shadow gap-2 sm:gap-0">
-        <h1 className="flex items-center gap-2 text-xl font-bold">
-          <img
-            src={cyprusFlag}
-            alt="Cyprus Flag"
-            className="w-6 h-4 object-cover"
-          />
-          Cyprus Food Map
+      <header className="p-4 flex justify-between items-center bg-white shadow">
+        <h1 className="text-xl font-bold flex items-center gap-2">
+          <Globe className="h-6 w-6 text-green-600" />
+          World Food Map
         </h1>
         <div
           className="cursor-pointer text-lg font-semibold"
