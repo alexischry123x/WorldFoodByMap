@@ -1,6 +1,14 @@
 import React from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
+// Change Google map pin to ours
+const foodPin = {
+  url: "/logo.png", // path to your transparent PNG
+  scaledSize: new window.google.maps.Size(40, 40), // adjust size
+  anchor: new window.google.maps.Point(20, 40), // pin tip points to exact location
+};
+
+
 interface Village {
   id: string;
   name: string;
