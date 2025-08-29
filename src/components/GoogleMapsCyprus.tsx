@@ -47,6 +47,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   scaledSize: new window.google.maps.Size(40, 40),
                   anchor: new window.google.maps.Point(20, 40),
                 };
+
                 return (
                   <Marker
                     key={village.id}
