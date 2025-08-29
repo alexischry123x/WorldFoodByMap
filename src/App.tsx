@@ -6,12 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { CartProvider } from "./components/CartContext"; // <-- Added CartProvider
-import Basket from "./pages/Basket"; // adjust path
-
-<Routes>
-  
-</Routes>
+import { CartProvider } from "./components/CartContext"; // <-- CartProvider
+import Basket from "./pages/Basket"; // <-- Basket page
 
 const queryClient = new QueryClient();
 
@@ -19,13 +15,13 @@ const App = () => (
   <ThemeProvider defaultTheme="light">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CartProvider> {/* <-- Wrap everything with CartProvider */}
+        <CartProvider> {/* Wrap everything in CartProvider */}
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/basket" element={<Basket />} /> {/* New route */}
+              <Route path="/basket" element={<Basket />} /> {/* Basket route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
