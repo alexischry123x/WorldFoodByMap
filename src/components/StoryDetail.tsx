@@ -30,7 +30,7 @@ Making zivania is an art that requires patience and intuition. We use the tradit
 
 During harvest season, the whole village comes together. Children run between the vines, their laughter mixing with the songs of the workers. In the evening, we gather to taste the new wine, sharing stories and planning for the year ahead.
 
-This isn't just a business for us - it's our connection to the land, to our ancestors, and to each other. Every bottle carries the essence of Omodos, the spirit of our mountains, and the love of our people.`
+This isn't just a business for us - it's our connection to the land, to our ancestors, and to each other. Every bottle carries the essence of Omodos, the spirit of our mountains, and the love of our people.`,
     videoUrl: '/videos/omodos-story.mp4',
   },
   '3': {
@@ -45,7 +45,7 @@ Each season brings different flavors to our honey. In spring, it tastes of cherr
 
 Making our preserves is a family tradition. My grandmother taught me to pick fruit at the perfect moment - when it's ripe but still firm, when the morning dew enhances its natural sweetness. We use old copper pots and wooden spoons, stirring slowly while sharing stories and laughter.
 
-Every jar we make carries the love of our family and the purity of our mountains. When you taste our honey, you taste the freedom of our bees and the ancient wisdom of Kakopetria.`
+Every jar we make carries the love of our family and the purity of our mountains. When you taste our honey, you taste the freedom of our bees and the ancient wisdom of Kakopetria.`,
     videoUrl: '/videos/kakopetria-story.mp4',
   },
   '4': {
