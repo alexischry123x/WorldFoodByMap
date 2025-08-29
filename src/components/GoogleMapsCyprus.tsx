@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 interface Village {
@@ -23,27 +23,55 @@ interface Props {
 }
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
-const center = { lat: 35.0, lng: 33.0 };
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [zoom, setZoom] = useState(10);
+  const [center, setCenter] = useState({ lat: 35.0, lng: 33.0 });
+
+  // Adjust zoom & center based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setZoom(9);
+        setCenter({ lat: 35.0, lng: 32.8 });
+      } else {
+        setZoom(10);
+        setCenter({ lat: 35.0, lng: 33.0 });
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleMapLoad = () => setMapLoaded(true);
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 p-4">
+    <div className="relative w-full max-w-6xl mx-auto p-4">
+      {/* Info overlays on left and right */}
+      <div className="hidden lg:block absolute top-1/4 left-0 w-1/5 p-4">
+        <div className="bg-white/70 rounded-xl p-4 shadow-lg text-center">
+          <h2 className="text-lg font-bold mb-2">Why Our Products?</h2>
+          <p className="text-gray-800 text-sm">
+            🏺 All items are handpicked directly by us from the villages, ensuring the best quality 
+            and proper quantity for every product you select.
+          </p>
+        </div>
+      </div>
 
-      {/* Info Section */}
-      <div className="lg:w-1/4 bg-white/80 rounded-2xl p-6 shadow-lg text-center lg:text-left">
-        <h2 className="text-xl font-bold mb-2">Why Our Products?</h2>
-        <p className="text-gray-800">
-          🏺 All items are handpicked directly by us from the villages, ensuring the best quality 
-          and proper quantity for every product you select.
-        </p>
+      <div className="hidden lg:block absolute top-1/4 right-0 w-1/5 p-4">
+        <div className="bg-white/70 rounded-xl p-4 shadow-lg text-center">
+          <h2 className="text-lg font-bold mb-2">Authentic & Fresh</h2>
+          <p className="text-gray-800 text-sm">
+            🌿 Each product is collected personally, so you get the real local flavors and quality.
+          </p>
+        </div>
       </div>
 
       {/* Map Section */}
-      <div className="lg:w-3/4 relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-6 shadow-2xl">
+      <div className="relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-6 shadow-2xl">
         <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg">
           🇨🇾 Cyprus Food Map
         </h1>
@@ -53,20 +81,28 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             <GoogleMap
               mapContainerStyle={containerStyle}
               center={center}
-              zoom={10}
+              zoom={zoom}
               onLoad={handleMapLoad}
             >
               {mapLoaded &&
                 villages.map((village) => {
+                  // Shift pins slightly for mobile if needed
+                  let lat = village.lat;
+                  let lng = village.lng;
+                  if (window.innerWidth < 768) {
+                    lng -= 0.02; // shift left a bit on mobile
+                  }
+
                   const foodPin = {
                     url: "/logo.png",
                     scaledSize: new window.google.maps.Size(40, 40),
                     anchor: new window.google.maps.Point(20, 40),
                   };
+
                   return (
                     <Marker
                       key={village.id}
-                      position={{ lat: village.lat, lng: village.lng }}
+                      position={{ lat, lng }}
                       onClick={() => onVillageClick(village)}
                       icon={foodPin}
                     />
@@ -101,4 +137,4 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   );
 };
 
-export default GoogleMapsCyprus;
+export defaul
