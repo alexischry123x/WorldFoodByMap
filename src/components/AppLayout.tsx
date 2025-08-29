@@ -2,7 +2,7 @@ import React from "react";
 import WorldFoodByMap from "./WorldFoodByMap";
 import { useCart } from "../components/CartContext";
 import { useNavigate } from "react-router-dom";
-import cyprusFlag from "../assets/cyprus.png";
+import cyprusFlag from "../assets/cy.png";
 
 const AppLayout: React.FC = () => {
   const { cart } = useCart();
