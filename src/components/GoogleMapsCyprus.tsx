@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import cyprusFlag from "../assets/cy.png"; // imported flag image
 
 interface Village {
   id: string;
@@ -32,21 +31,29 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const handleMapLoad = () => setMapLoaded(true);
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto">
-      <div className="relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-8 shadow-2xl">
-        {/* Title with flag */}
-        <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-3">
-          <img src={cyprusFlag} alt="Cyprus" className="h-10 w-10" />
-          <span>Cyprus Food Map</span>
+    <div className="relative w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 p-4">
+
+      {/* Info Section */}
+      <div className="lg:w-1/4 bg-white/80 rounded-2xl p-6 shadow-lg text-center lg:text-left">
+        <h2 className="text-xl font-bold mb-2">Why Our Products?</h2>
+        <p className="text-gray-800">
+          🏺 All items are handpicked directly by us from the villages, ensuring the best quality 
+          and proper quantity for every product you select.
+        </p>
+      </div>
+
+      {/* Map Section */}
+      <div className="lg:w-3/4 relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-6 shadow-2xl">
+        <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg">
+          🇨🇾 Cyprus Food Map
         </h1>
 
-        {/* Google Map */}
         <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap
               mapContainerStyle={containerStyle}
               center={center}
-              zoom={10}  // zoom kept at 10
+              zoom={10}
               onLoad={handleMapLoad}
             >
               {mapLoaded &&
@@ -56,7 +63,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                     scaledSize: new window.google.maps.Size(40, 40),
                     anchor: new window.google.maps.Point(20, 40),
                   };
-
                   return (
                     <Marker
                       key={village.id}
@@ -70,7 +76,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           </LoadScript>
         </div>
 
-        {/* Buttons under the map */}
+        {/* Village Buttons */}
         <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
           {villages.map((village) => (
             <button
@@ -85,7 +91,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           ))}
         </div>
 
-        {/* Footer text */}
         <div className="mt-6 text-center">
           <p className="text-white text-lg font-medium drop-shadow">
             Click on any village to discover authentic Cypriot products! 🏺
