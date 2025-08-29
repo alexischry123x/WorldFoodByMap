@@ -13,7 +13,6 @@ interface Village {
   price: string;
   story: string;
   storyteller: string;
-  images: string[]; // New: array of image URLs
 }
 
 const villageData: Record<string, Village> = {
@@ -27,12 +26,7 @@ const villageData: Record<string, Village> = {
     description: 'Famous for its intricate handmade lace, a UNESCO recognized craft passed down through generations.',
     price: '€45-150',
     story: 'My grandmother taught me when I was just 8 years old. Each pattern tells a story of our village...',
-    storyteller: 'Maria Constantinou, 78',
-    images: [
-      '/images/lefkara1.jpg',
-      '/images/lefkara2.jpg',
-      '/images/lefkara3.jpg',
-    ],
+    storyteller: 'Maria Constantinou, 78'
   },
   '2': {
     id: '2',
@@ -44,13 +38,44 @@ const villageData: Record<string, Village> = {
     description: 'Traditional Cypriot wine and zivania (grape brandy) made from ancient vine varieties.',
     price: '€15-35',
     story: 'Our family has been making wine for over 200 years. The secret is in the mountain soil...',
-    storyteller: 'Andreas Kyprianou, 65',
-    images: [
-      '/images/omodos1.jpg',
-      '/images/omodos2.jpg',
-    ],
+    storyteller: 'Andreas Kyprianou, 65'
   },
-  // Add other villages similarly...
+  '3': {
+    id: '3',
+    name: 'Kakopetria',
+    product: 'Honey & Preserves',
+    villageInfo: 'Kakopetria is a small village in Cyprus, in the Nicosia district, nestled in the Troodos Mountains. It has a population of 1,200. Kakopetria is famous for their honey because this product has been made in Kakopetria since old age, with beekeepers using traditional methods passed down for centuries.',
+    population: 1200,
+    district: 'Nicosia',
+    description: 'Pure mountain honey and traditional fruit preserves made from local orchards.',
+    price: '€8-25',
+    story: 'The bees know the best flowers in our mountains. This honey tastes like sunshine...',
+    storyteller: 'Eleni Georgiou, 72'
+  },
+  '4': {
+    id: '4',
+    name: 'Platres',
+    product: 'Rose Products',
+    villageInfo: 'Platres is a small village in Cyprus, in the Limassol district, located in the Troodos Mountains. It has a population of 250. Platres is famous for their rose products because roses have been cultivated in Platres since the Ottoman period, with the mountain climate creating perfect conditions for fragrant roses.',
+    population: 250,
+    district: 'Limassol',
+    description: 'Rose water, oils, and cosmetics from the famous Platres mountain roses.',
+    price: '€12-40',
+    story: 'Every morning at dawn, we pick roses when the dew is still fresh...',
+    storyteller: 'Sophia Panayiotou, 69'
+  },
+  '5': {
+    id: '5',
+    name: 'Lania',
+    product: 'Olive Oil',
+    villageInfo: 'Lania is a small village in Cyprus, in the Limassol district. It has a population of 50. Lania is famous for their olive oil because this product has been made in Lania since old age, with olive groves that have been in families for generations and some trees over 500 years old.',
+    population: 50,
+    district: 'Limassol',
+    description: 'Extra virgin olive oil from centuries-old olive groves in the Troodos mountains.',
+    price: '€18-30',
+    story: 'These olive trees were planted by my great-grandfather. They know our family...',
+    storyteller: 'Costas Michaelis, 74'
+  }
 };
 
 interface Props {
@@ -62,18 +87,8 @@ interface Props {
 
 const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onReadStory }) => {
   const village = villageData[villageId];
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [currentImage, setCurrentImage] = React.useState(0);
-
+  
   if (!village) return null;
-
-  const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % village.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImage((prev) => (prev === 0 ? village.images.length - 1 : prev - 1));
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 p-6">
@@ -86,18 +101,11 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Map
         </Button>
-
+        
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            {/* Clickable title opens modal */}
-            <h1
-              className="text-5xl font-bold text-amber-800 mb-6 cursor-pointer hover:text-amber-600 transition"
-              onClick={() => setIsModalOpen(true)}
-            >
-              {village.name}
-            </h1>
-
-            {/* Village Information */}
+            <h1 className="text-5xl font-bold text-amber-800 mb-6">{village.name}</h1>
+            
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl mb-6 text-left">
               <h2 className="text-2xl font-bold text-blue-800 mb-4">About {village.name}</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">{village.villageInfo}</p>
@@ -106,8 +114,7 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
                 <div><strong>Population:</strong> {village.population.toLocaleString()}</div>
               </div>
             </div>
-
-            {/* Product Information */}
+            
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl mb-6">
               <h2 className="text-2xl text-amber-600 font-semibold mb-3">{village.product}</h2>
               <p className="text-gray-700 leading-relaxed text-lg">{village.description}</p>
@@ -116,7 +123,7 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
               </div>
             </div>
           </div>
-
+          
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl text-center">
@@ -131,13 +138,13 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
                 </Button>
               </div>
             </div>
-
+            
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl">
                 <h3 className="text-xl font-bold text-blue-800 mb-3">Traditional Story</h3>
                 <p className="text-gray-700 italic leading-relaxed mb-3">"{village.story}"</p>
                 <p className="text-sm text-blue-600 font-medium mb-4">— {village.storyteller}</p>
-
+                
                 <Button 
                   onClick={onReadStory}
                   variant="outline"
@@ -151,44 +158,6 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
           </div>
         </div>
       </div>
-
-      {/* Modal Carousel */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="relative bg-white rounded-2xl max-w-3xl w-full p-4">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
-            >
-              X
-            </button>
-
-            <div className="flex items-center justify-center">
-              <button
-                onClick={prevImage}
-                className="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-              >
-                &lt;
-              </button>
-              <img
-                src={village.images[currentImage]}
-                alt={`${village.name} ${currentImage + 1}`}
-                className="max-h-96 rounded-xl"
-              />
-              <button
-                onClick={nextImage}
-                className="ml-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-              >
-                &gt;
-              </button>
-            </div>
-
-            <p className="text-center mt-2 text-gray-600">
-              {currentImage + 1} / {village.images.length}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
