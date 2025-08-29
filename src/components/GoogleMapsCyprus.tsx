@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import cyFlag from "../assets/cy.png";
+import cyprusFlag from "../assets/cy.png"; // imported flag image
 
 interface Village {
   id: string;
@@ -34,11 +34,11 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   return (
     <div className="relative w-full max-w-6xl mx-auto">
       <div className="relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-8 shadow-2xl">
-        {/* Map title with Cyprus flag */}
-        <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
-  <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
-  <span>Cyprus Food Map</span>
-</h1>
+        {/* Title with flag */}
+        <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-3">
+          <img src={cyprusFlag} alt="Cyprus" className="h-10 w-10" />
+          <span>Cyprus Food Map</span>
+        </h1>
 
         {/* Google Map */}
         <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
@@ -46,7 +46,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             <GoogleMap
               mapContainerStyle={containerStyle}
               center={center}
-              zoom={10}
+              zoom={10}  // zoom kept at 10
               onLoad={handleMapLoad}
             >
               {mapLoaded &&
@@ -68,6 +68,28 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                 })}
             </GoogleMap>
           </LoadScript>
+        </div>
+
+        {/* Buttons under the map */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+          {villages.map((village) => (
+            <button
+              key={village.id}
+              onClick={() => onVillageClick(village)}
+              className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
+            >
+              <div className="text-2xl mb-2">📍</div>
+              <div className="font-bold text-gray-800">{village.name}</div>
+              <div className="text-sm text-gray-600">{village.product}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Footer text */}
+        <div className="mt-6 text-center">
+          <p className="text-white text-lg font-medium drop-shadow">
+            Click on any village to discover authentic Cypriot products! 🏺
+          </p>
         </div>
       </div>
     </div>
