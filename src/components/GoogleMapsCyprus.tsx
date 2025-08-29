@@ -94,11 +94,10 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
       </div>
 
       <div className="mt-6 text-center">
-        <p className="text-white text-lg font-medium drop-shadow">
-          Click on any village to discover authentic Cypriot products! 🏺
-        </p>
-      </div>
-    </div>
+  <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
+    Click on any village to discover authentic Cypriot products! 🏺
+  </p>
+</div>
   );
 };
 
