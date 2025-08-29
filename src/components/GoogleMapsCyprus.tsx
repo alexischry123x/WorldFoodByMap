@@ -42,13 +42,11 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
               {villages.map((village) => {
-                // Define foodPin inside the map so google.maps exists
                 const foodPin = {
-                  url: "/logo.png", // path to your transparent PNG
+                  url: "/logo.png",
                   scaledSize: new window.google.maps.Size(40, 40),
                   anchor: new window.google.maps.Point(20, 40),
                 };
-
                 return (
                   <Marker
                     key={village.id}
@@ -67,4 +65,4 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           {villages.map((village) => (
             <button
               key={village.id}
-              onClick=
+              onClick={() => onVillageClick(v
