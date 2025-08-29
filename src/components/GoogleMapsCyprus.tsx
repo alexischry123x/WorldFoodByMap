@@ -1,14 +1,6 @@
 import React from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
-// Change Google map pin to ours
-const foodPin = {
-  url: "/logo.png", // path to your transparent PNG
-  scaledSize: new window.google.maps.Size(40, 40), // adjust size
-  anchor: new window.google.maps.Point(20, 40), // pin tip points to exact location
-};
-
-
 interface Village {
   id: string;
   name: string;
@@ -49,16 +41,24 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
-  {villages.map((village) => (
-    <Marker
-      key={village.id}
-      position={{ lat: village.lat, lng: village.lng }}
-      onClick={() => onVillageClick(village)}
-      icon={foodPin} // <-- this applies your custom logo
-    />
-  ))}
-</GoogleMap>
+              {villages.map((village) => {
+                // Define foodPin inside the map so google.maps exists
+                const foodPin = {
+                  url: "/logo.png", // path to your transparent PNG
+                  scaledSize: new window.google.maps.Size(40, 40),
+                  anchor: new window.google.maps.Point(20, 40),
+                };
 
+                return (
+                  <Marker
+                    key={village.id}
+                    position={{ lat: village.lat, lng: village.lng }}
+                    onClick={() => onVillageClick(village)}
+                    icon={foodPin}
+                  />
+                );
+              })}
+            </GoogleMap>
           </LoadScript>
         </div>
 
@@ -67,24 +67,4 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           {villages.map((village) => (
             <button
               key={village.id}
-              onClick={() => onVillageClick(village)}
-              className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-2">📍</div>
-              <div className="font-bold text-gray-800">{village.name}</div>
-              <div className="text-sm text-gray-600">{village.product}</div>
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 text-center">
-          <p className="text-white text-lg font-medium drop-shadow">
-            Click on any village to discover authentic Cypriot products! 🏺
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default GoogleMapsCyprus;
+              onClick=
