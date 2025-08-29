@@ -137,4 +137,4 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   );
 };
 
-export defaul
+export default GoogleMapsCyprus;
