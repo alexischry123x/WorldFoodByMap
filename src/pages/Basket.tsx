@@ -1,5 +1,5 @@
 import React from "react";
-import { useCart } from "./components/CartContext";
+import { useCart } from "../components/CartContext";
 import { Button, Input } from "@/components/ui/button"; // adjust Input import if needed
 
 const Basket: React.FC = () => {
