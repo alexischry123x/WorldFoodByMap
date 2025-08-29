@@ -42,11 +42,14 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
               {villages.map((village) => {
-                const foodPin = {
-                  url: "/logo.png",
-                  scaledSize: new window.google.maps.Size(40, 40),
-                  anchor: new window.google.maps.Point(20, 40),
-                };
+                // Only define custom pin if Google Maps API is ready
+                const foodPin = window.google?.maps
+                  ? {
+                      url: "/logo.png",
+                      scaledSize: new window.google.maps.Size(40, 40),
+                      anchor: new window.google.maps.Point(20, 40),
+                    }
+                  : undefined;
 
                 return (
                   <Marker
