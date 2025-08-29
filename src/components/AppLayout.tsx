@@ -1,6 +1,6 @@
 import React from "react";
 import WorldFoodByMap from "./WorldFoodByMap";
-import { useCart } from "./CartContext";
+import { useCart } from "./components/CartContext";
 import { useNavigate } from "react-router-dom";
 
 const AppLayout: React.FC = () => {
