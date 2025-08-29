@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ShoppingCart, BookOpen } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, BookOpen, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ImageGallery from 'react-image-gallery';
-import 'react-image-gallery/styles/css/image-gallery.css';
 
 interface Village {
   id: string;
@@ -15,10 +13,9 @@ interface Village {
   price: string;
   story: string;
   storyteller: string;
-  images: string[]; // New: Images for gallery
+  images: string[]; // <-- array of image URLs
 }
 
-// Example: add image URLs for each village
 const villageData: Record<string, Village> = {
   '1': {
     id: '1',
@@ -31,9 +28,13 @@ const villageData: Record<string, Village> = {
     price: '€45-150',
     story: 'My grandmother taught me when I was just 8 years old. Each pattern tells a story of our village...',
     storyteller: 'Maria Constantinou, 78',
-    images: ['/images/lefkara1.jpg', '/images/lefkara2.jpg', '/images/lefkara3.jpg']
+    images: [
+      '/images/lefkara1.jpg',
+      '/images/lefkara2.jpg',
+      '/images/lefkara3.jpg'
+    ]
   },
-  // Add images for other villages similarly...
+  // add similar images array for other villages
 };
 
 interface Props {
@@ -45,15 +46,16 @@ interface Props {
 
 const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onReadStory }) => {
   const village = villageData[villageId];
-  const [showGallery, setShowGallery] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
 
   if (!village) return null;
 
-  // Prepare images for react-image-gallery
-  const galleryImages = village.images.map((img) => ({
-    original: img,
-    thumbnail: img,
-  }));
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const prevImage = () => setCurrentImage((prev) => (prev === 0 ? village.images.length - 1 : prev - 1));
+  const nextImage = () => setCurrentImage((prev) => (prev === village.images.length - 1 ? 0 : prev + 1));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 p-6">
@@ -69,7 +71,12 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
         
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-amber-800 mb-6">{village.name}</h1>
+            <h1
+  className="text-5xl font-bold text-amber-800 mb-6 cursor-pointer hover:text-amber-600 transition"
+  onClick={() => setIsModalOpen(true)}
+>
+  {village.name}
+</h1>
             
             {/* Village Information */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl mb-6 text-left">
@@ -79,23 +86,12 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
                 <div><strong>District:</strong> {village.district}</div>
                 <div><strong>Population:</strong> {village.population.toLocaleString()}</div>
               </div>
-              
-              {/* Button to toggle images */}
-              {village.images.length > 0 && (
-                <Button
-                  onClick={() => setShowGallery(!showGallery)}
-                  className="mt-4 w-full bg-blue-500 text-white hover:bg-blue-600"
-                >
-                  {showGallery ? 'Hide Images' : `About ${village.name} Images`}
-                </Button>
-              )}
-
-              {/* Image gallery */}
-              {showGallery && (
-                <div className="mt-4">
-                  <ImageGallery items={galleryImages} showPlayButton={false} />
-                </div>
-              )}
+              <Button 
+                onClick={openModal}
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                View Photos
+              </Button>
             </div>
             
             {/* Product Information */}
@@ -142,6 +138,38 @@ const VillageDetail: React.FC<Props> = ({ villageId, onBack, onBuyProduct, onRea
           </div>
         </div>
       </div>
+
+      {/* Modal for images */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-2xl max-w-3xl w-full p-4">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="flex items-center justify-center">
+              <button onClick={prevImage} className="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                <ChevronLeft size={24} />
+              </button>
+              <img
+                src={village.images[currentImage]}
+                alt={`${village.name} ${currentImage + 1}`}
+                className="max-h-96 rounded-xl"
+              />
+              <button onClick={nextImage} className="ml-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            <p className="text-center mt-2 text-gray-600">
+              {currentImage + 1} / {village.images.length}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
