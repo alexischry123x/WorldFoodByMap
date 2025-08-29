@@ -7,6 +7,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { CartProvider } from "./CartContext"; // <-- Added CartProvider
+import Basket from "./pages/Basket"; // adjust path
+
+<Routes>
+  
+</Routes>
 
 const queryClient = new QueryClient();
 
@@ -20,6 +25,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/basket" element={<Basket />} /> {/* New route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
