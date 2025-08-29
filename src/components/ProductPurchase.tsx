@@ -3,6 +3,7 @@ import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useCart } from './CartContext'; // <-- import CartContext
 
 interface Props {
   villageId: string;
@@ -12,7 +13,18 @@ interface Props {
 const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
   const [quantity, setQuantity] = useState(1);
   const [email, setEmail] = useState('');
-  
+  const { addToCart } = useCart(); // <-- get addToCart function
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: villageId,
+      name: `Product from Village ${villageId}`,
+      price: 25,
+      quantity,
+    });
+    alert(`Added ${quantity} item(s) to your basket!`);
+  };
+
   const handlePurchase = () => {
     alert('Thank you! Your order has been placed. You will receive a confirmation email shortly.');
     onBack();
@@ -29,13 +41,14 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Village
         </Button>
-        
+
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <h1 className="text-3xl font-bold text-green-800 mb-6 text-center">
             🛒 Complete Your Purchase
           </h1>
-          
+
           <div className="space-y-6">
+            {/* Order Summary */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl">
               <h3 className="text-lg font-semibold text-green-800 mb-4">Order Summary</h3>
               <div className="flex justify-between items-center mb-4">
@@ -53,7 +66,8 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
                 <span className="text-green-600">€{(25 * quantity).toFixed(2)}</span>
               </div>
             </div>
-            
+
+            {/* Email & Shipping */}
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email">Email Address</Label>
@@ -65,13 +79,13 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              
               <div>
                 <Label htmlFor="address">Shipping Address</Label>
                 <Input id="address" placeholder="Your full address" />
               </div>
             </div>
-            
+
+            {/* Features */}
             <div className="grid grid-cols-3 gap-4 text-center text-sm text-gray-600">
               <div className="flex flex-col items-center">
                 <Shield className="h-8 w-8 text-green-500 mb-2" />
@@ -86,8 +100,16 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
                 <span>Easy Returns</span>
               </div>
             </div>
-            
-            <Button 
+
+            {/* Buttons */}
+            <Button
+              onClick={handleAddToCart}
+              className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-lg"
+            >
+              🛒 Add to Basket
+            </Button>
+
+            <Button
               onClick={handlePurchase}
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 text-lg"
               disabled={!email}
