@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { CartProvider } from "./CartContext"; // <-- Added CartProvider
+import { CartProvider } from "./components/CartContext"; // <-- Added CartProvider
 import Basket from "./pages/Basket"; // adjust path
 
 <Routes>
