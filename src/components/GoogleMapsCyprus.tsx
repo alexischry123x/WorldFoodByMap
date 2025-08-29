@@ -31,6 +31,15 @@ const containerStyle = {
 const center = { lat: 35.0, lng: 33.0 };
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
+  // Custom icon
+  const foodPin = typeof window !== "undefined" && window.google
+    ? {
+        url: "/logo.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+        anchor: new window.google.maps.Point(20, 40),
+      }
+    : undefined;
+
   return (
     <div className="relative w-full max-w-6xl mx-auto">
       <div className="relative bg-gradient-to-br from-blue-400 via-blue-300 to-green-300 rounded-3xl p-8 shadow-2xl">
@@ -40,33 +49,19 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
         <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-            {(google) => {
-              // Only create the custom pin after API is ready
-              const foodPin = google.maps
-                ? {
-                    url: "/logo.png",
-                    scaledSize: new google.maps.Size(40, 40),
-                    anchor: new google.maps.Point(20, 40),
-                  }
-                : undefined;
-
-              return (
-                <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
-                  {villages.map((village) => (
-                    <Marker
-                      key={village.id}
-                      position={{ lat: village.lat, lng: village.lng }}
-                      onClick={() => onVillageClick(village)}
-                      icon={foodPin}
-                    />
-                  ))}
-                </GoogleMap>
-              );
-            }}
+            <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={9}>
+              {villages.map((village) => (
+                <Marker
+                  key={village.id}
+                  position={{ lat: village.lat, lng: village.lng }}
+                  onClick={() => onVillageClick(village)}
+                  icon={foodPin}
+                />
+              ))}
+            </GoogleMap>
           </LoadScript>
         </div>
 
-        {/* Village buttons below map */}
         <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
           {villages.map((village) => (
             <button
