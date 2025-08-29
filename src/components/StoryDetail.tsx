@@ -55,7 +55,6 @@ interface Props {
 
 const StoryDetail: React.FC<Props> = ({ villageId, onBack }) => {
   const story = storyData[villageId];
-  
   if (!story) return null;
 
   return (
@@ -69,7 +68,7 @@ const StoryDetail: React.FC<Props> = ({ villageId, onBack }) => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Village
         </Button>
-        
+
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-purple-800 mb-4">{story.title}</h1>
@@ -84,7 +83,8 @@ const StoryDetail: React.FC<Props> = ({ villageId, onBack }) => {
               </div>
             </div>
           </div>
-          
+
+          {/* Story content */}
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-2xl">
             <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
               {story.fullStory.split('\n\n').map((paragraph: string, index: number) => (
@@ -94,7 +94,7 @@ const StoryDetail: React.FC<Props> = ({ villageId, onBack }) => {
               ))}
             </div>
 
-            {/* Video Section */}
+            {/* Video */}
             {story.videoUrl && (
               <div className="mt-8">
                 <h2 className="text-2xl font-semibold text-purple-800 mb-4">Watch the Story</h2>
@@ -105,7 +105,7 @@ const StoryDetail: React.FC<Props> = ({ villageId, onBack }) => {
               </div>
             )}
           </div>
-          
+
           <div className="mt-8 text-center">
             <Button 
               onClick={onBack}
