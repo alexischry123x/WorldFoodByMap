@@ -64,7 +64,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   scaledSize: new window.google.maps.Size(40, 40),
                   anchor: new window.google.maps.Point(20, 40),
                 };
-
                 return (
                   <Marker
                     key={village.id}
@@ -93,11 +92,13 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         ))}
       </div>
 
+      {/* Bottom info text */}
       <div className="mt-6 text-center">
-  <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
-    Click on any village to discover authentic Cypriot products! 🏺
-  </p>
-</div>
+        <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
+          Click on any village to discover authentic Cypriot products! 🏺
+        </p>
+      </div>
+    </div>
   );
 };
 
