@@ -55,8 +55,8 @@ const App = () => (
               <Route path="/contact" element={<ContactUs />} />
 
               {/* Village pages */}
-              <Route path="/village/:villageId" element={<VillageDetailWrapper />} />
-              <Route path="/story/:villageId" element={<StoryDetailWrapper />} />
+              <Route path="/village/:villageId" element={<VillageDetail />} />
+              <Route path="/story/:villageId" element={<StoryDetail />} />
 
               {/* Fallback */}
               <Route path="*" element={<NotFound />} />
