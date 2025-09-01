@@ -25,7 +25,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -34,7 +34,6 @@ const App = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Menu items
   const menuItems = [
     { name: "Map", path: "/" },
     { name: "About", path: "/about" },
@@ -56,35 +55,54 @@ const App = () => {
             <BrowserRouter>
               <div className="flex h-screen">
 
-                {/* Sidebar */}
-                <div
-                  className={`
-                    bg-white shadow-md z-50
-                    ${isMobile ? "fixed top-0 left-0 w-full h-auto flex justify-between p-4" : "relative w-20 hover:w-56 transition-all duration-300"}
-                    flex flex-col
-                  `}
-                  onMouseEnter={() => !isMobile && setSidebarOpen(true)}
-                  onMouseLeave={() => !isMobile && setSidebarOpen(false)}
-                >
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      className={`
-                        flex items-center gap-2 px-4 py-3 rounded-lg
-                        hover:bg-blue-100 hover:text-blue-800 transition-colors
-                        ${isMobile || sidebarOpen ? "justify-start" : "justify-center"}
-                      `}
-                    >
-                      <span className={isMobile || sidebarOpen ? "font-bold" : "sr-only"}>
+                {/* Sidebar for desktop */}
+                {!isMobile && (
+                  <div className="w-56 bg-white shadow-md flex flex-col p-4">
+                    {menuItems.map(item => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        className="px-4 py-3 rounded-lg text-gray-800 hover:bg-blue-100 hover:text-blue-800 font-semibold transition-colors"
+                      >
                         {item.name}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
-                {/* Main Content */}
-                <div className={`flex-1 overflow-auto ${isMobile ? "mt-20" : "ml-20"}`}>
+                {/* Main content */}
+                <div className="flex-1 relative">
+                  
+                  {/* Mobile top bar */}
+                  {isMobile && (
+                    <div className="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+                      <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="text-2xl font-bold"
+                      >
+                        ☰
+                      </button>
+                      <span className="font-bold text-blue-700">World Food By Map</span>
+                    </div>
+                  )}
+
+                  {/* Mobile menu overlay */}
+                  {isMobile && mobileMenuOpen && (
+                    <div className="absolute top-0 left-0 w-full h-screen bg-white z-50 flex flex-col p-6 gap-4">
+                      {menuItems.map(item => (
+                        <Link
+                          key={item.name}
+                          to={item.path}
+                          className="text-lg font-semibold text-gray-800 hover:text-blue-700"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Routes */}
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/basket" element={<Basket />} />
@@ -95,14 +113,13 @@ const App = () => {
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/contact" element={<ContactUs />} />
 
-                    {/* Village pages */}
                     <Route path="/village/:villageId" element={<VillageDetail />} />
                     <Route path="/story/:villageId" element={<StoryDetail />} />
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                </div>
 
+                </div>
               </div>
             </BrowserRouter>
           </CartProvider>
