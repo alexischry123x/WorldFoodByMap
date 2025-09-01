@@ -30,6 +30,7 @@ const mobileCenter = { lat: 34.95, lng: 32.95 };
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -38,8 +39,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const defaultCenter = isMobile ? mobileCenter : webCenter;
-  const zoomLevel = isMobile ? 9 : 10;
+  const handleMapLoad = () => setMapLoaded(true);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -52,8 +52,13 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
       {/* Map */}
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-          <GoogleMap mapContainerStyle={containerStyle} center={defaultCenter} zoom={zoomLevel}>
-            {typeof window !== "undefined" && window.google && villages.map((village) => {
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={isMobile ? mobileCenter : webCenter}
+            zoom={isMobile ? 9 : 10}
+            onLoad={handleMapLoad}
+          >
+            {mapLoaded && window.google && villages.map((village) => {
               const foodPin = {
                 url: "/logo.png",
                 scaledSize: new window.google.maps.Size(40, 40),
