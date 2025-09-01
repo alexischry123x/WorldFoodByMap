@@ -30,6 +30,7 @@ const mobileCenter = { lat: 34.95, lng: 32.95 };
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -37,6 +38,8 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleMapLoad = () => setMapLoaded(true);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -51,36 +54,42 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             mapContainerStyle={containerStyle}
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
+            onLoad={handleMapLoad}
           >
-            {villages.map((village) => {
-              const foodPin = {
-                url: "/logo.png",
-                scaledSize: new window.google.maps.Size(40, 40),
-                anchor: new window.google.maps.Point(20, 40),
-              };
-              return (
-                <React.Fragment key={village.id}>
-                  <Marker
-                    position={{ lat: village.lat, lng: village.lng }}
-                    icon={foodPin}
-                    onClick={() => onVillageClick(village)}
-                    onMouseOver={() => setHoveredMarkerId(village.id)}
-                    onMouseOut={() => setHoveredMarkerId(null)}
-                  />
-                  {hoveredMarkerId === village.id && (
-                    <OverlayView
-                      position={{ lat: village.lat, lng: village.lng }}
-                      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                    >
-                      <div className="bg-white rounded-lg shadow-lg p-2 text-center whitespace-nowrap">
-                        <div className="font-bold">{village.product}</div>
-                        <div>{village.name}</div>
-                      </div>
-                    </OverlayView>
-                  )}
-                </React.Fragment>
-              );
-            })}
+            {mapLoaded && window.google && (
+              <>
+                {villages.map((village) => {
+                  const foodPin = {
+                    url: "/logo.png",
+                    scaledSize: new window.google.maps.Size(40, 40),
+                    anchor: new window.google.maps.Point(20, 40),
+                  };
+
+                  return (
+                    <React.Fragment key={village.id}>
+                      <Marker
+                        position={{ lat: village.lat, lng: village.lng }}
+                        icon={foodPin}
+                        onClick={() => onVillageClick(village)}
+                        onMouseOver={() => setHoveredMarkerId(village.id)}
+                        onMouseOut={() => setHoveredMarkerId(null)}
+                      />
+                      {hoveredMarkerId === village.id && (
+                        <OverlayView
+                          position={{ lat: village.lat, lng: village.lng }}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className="bg-white rounded-lg shadow-lg p-2 text-center whitespace-nowrap">
+                            <div className="font-bold">{village.product}</div>
+                            <div>{village.name}</div>
+                          </div>
+                        </OverlayView>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </>
+            )}
           </GoogleMap>
         </LoadScript>
       </div>
