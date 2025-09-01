@@ -21,13 +21,15 @@ const villages: Village[] = [
 
 interface Props {
   onVillageClick: (village: Village) => void;
+  onCountryHover?: (country: string) => void; // optional callback to update country title
+  country?: string; // current country name
 }
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
+const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick, onCountryHover, country = "Cyprus" }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -41,11 +43,15 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   const handleMapLoad = () => setMapLoaded(true);
 
+  const handleCountryHover = () => {
+    if (onCountryHover) onCountryHover(country);
+  };
+
   return (
     <div className="relative w-full max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
-        <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
-        <span>Cyprus Food Map</span>
+        <img src={cyFlag} alt={`${country} Flag`} className="h-8 w-8 rounded-sm" />
+        <span>{country} Food Map</span>
       </h1>
 
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
@@ -55,6 +61,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
             onLoad={handleMapLoad}
+            onMouseOver={handleCountryHover} // update title when mouse enters the map
           >
             {mapLoaded && window.google && (
               <>
@@ -75,16 +82,16 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                         onMouseOut={() => setHoveredMarkerId(null)}
                       />
                       {hoveredMarkerId === village.id && (
-  <OverlayView
-    position={{ lat: village.lat, lng: village.lng }}
-    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-  >
-    <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
-      <div className="font-bold">{village.product}</div>
-      <div>{village.name}</div>
-    </div>
-  </OverlayView>
-)}
+                        <OverlayView
+                          position={{ lat: village.lat, lng: village.lng }}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
+                            <div className="font-bold">{village.product}</div>
+                            <div>{village.name}</div>
+                          </div>
+                        </OverlayView>
+                      )}
                     </React.Fragment>
                   );
                 })}
@@ -110,7 +117,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
       <div className="mt-6 text-center">
         <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
-          Click on any village to discover authentic Cypriot products! 🏺
+          Click on any village to discover authentic {country} products! 🏺
         </p>
       </div>
     </div>
