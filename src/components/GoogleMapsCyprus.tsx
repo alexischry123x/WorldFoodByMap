@@ -31,6 +31,7 @@ const mobileCenter = { lat: 34.95, lng: 32.95 };
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [hoveredVillage, setHoveredVillage] = useState<Village | null>(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -43,13 +44,11 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
-      {/* Title */}
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
         <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
         <span>Cyprus Food Map</span>
       </h1>
 
-      {/* Map */}
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
@@ -69,11 +68,24 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   key={village.id}
                   position={{ lat: village.lat, lng: village.lng }}
                   onClick={() => onVillageClick(village)}
+                  onMouseOver={() => setHoveredVillage(village)}
+                  onMouseOut={() => setHoveredVillage(null)}
                   icon={foodPin}
-                  title={village.product} // Tooltip
                 />
               );
             })}
+
+            {hoveredVillage && (
+              <InfoWindow
+                position={{ lat: hoveredVillage.lat, lng: hoveredVillage.lng }}
+                onCloseClick={() => setHoveredVillage(null)}
+              >
+                <div className="text-center">
+                  <div className="font-bold text-gray-900">{hoveredVillage.product}</div>
+                  <div className="text-gray-700">{hoveredVillage.name}</div>
+                </div>
+              </InfoWindow>
+            )}
           </GoogleMap>
         </LoadScript>
       </div>
@@ -84,20 +96,13 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           <button
             key={village.id}
             onClick={() => onVillageClick(village)}
-            title={village.product} // Tooltip
+            title={village.product}
             className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
           >
             <div className="font-bold text-gray-800">{village.product}</div>
             <div className="text-sm text-gray-600">{village.name}</div>
           </button>
         ))}
-      </div>
-
-      {/* Bottom info text */}
-      <div className="mt-6 text-center">
-        <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
-          Click on any village to discover authentic Cypriot products! 🏺
-        </p>
       </div>
     </div>
   );
