@@ -27,7 +27,7 @@ const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-// Big rectangle covering the whole world (outer polygon)
+// Outer world polygon
 const worldBounds = [
   { lat: 90, lng: -180 },
   { lat: -90, lng: -180 },
@@ -35,12 +35,12 @@ const worldBounds = [
   { lat: 90, lng: 180 },
 ];
 
-// Rough polygon around Cyprus (hole) to keep it visible
-const cyprusBounds = [
-  { lat: 35.7, lng: 32.2 },
+// Hole polygon roughly around Cyprus
+const cyprusHole = [
+  { lat: 35.8, lng: 32.2 },
   { lat: 34.55, lng: 32.2 },
   { lat: 34.55, lng: 34.0 },
-  { lat: 35.7, lng: 34.0 },
+  { lat: 35.8, lng: 34.0 },
 ];
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
@@ -59,13 +59,11 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
-      {/* Title */}
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
         <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
         <span>Cyprus Food Map</span>
       </h1>
 
-      {/* Map */}
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
@@ -76,9 +74,9 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           >
             {mapLoaded && window.google && (
               <>
-                {/* Grey overlay with a hole for Cyprus */}
+                {/* Grey overlay with hole for Cyprus */}
                 <Polygon
-                  paths={[worldBounds, cyprusBounds]} // first = outer, second = hole
+                  paths={[worldBounds, cyprusHole]} // outer + hole
                   options={{
                     fillColor: "#d3d3d3",
                     fillOpacity: 0.6,
@@ -86,16 +84,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                     clickable: false,
                   }}
                 />
-
-                {/* "Coming Soon" label outside Cyprus */}
-                <OverlayView
-                  position={{ lat: 34.0, lng: 32.0 }}
-                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                >
-                  <div className="text-4xl font-bold text-gray-400 select-none pointer-events-none">
-                    Coming Soon 🌍
-                  </div>
-                </OverlayView>
 
                 {/* Village markers */}
                 {villages.map((village) => (
@@ -130,7 +118,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         </LoadScript>
       </div>
 
-      {/* Bottom buttons */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
         {villages.map((village) => (
           <button
