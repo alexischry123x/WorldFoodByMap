@@ -1,4 +1,5 @@
 // src/App.tsx
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster"; 
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,12 +7,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "./components/CartContext";
-import { useState } from "react";
 
 import Index from "./pages/Index";
 import Basket from "./pages/Basket";
 import NotFound from "./pages/NotFound";
-
 import About from "./pages/About";
 import Products from "./pages/Products";
 import Gallery from "./pages/Gallery";
@@ -25,20 +24,27 @@ import StoryDetail from "./components/StoryDetail";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const MenuLinks = () => (
-    <>
-      <Link to="/" className="font-bold text-gray-800 hover:text-blue-700">Map</Link>
-      <Link to="/about" className="font-bold text-gray-800 hover:text-blue-700">About</Link>
-      <Link to="/products" className="font-bold text-gray-800 hover:text-blue-700">Products</Link>
-      <Link to="/gallery" className="font-bold text-gray-800 hover:text-blue-700">Gallery</Link>
-      <Link to="/events" className="font-bold text-gray-800 hover:text-blue-700">Events</Link>
-      <Link to="/faq" className="font-bold text-gray-800 hover:text-blue-700">FAQ</Link>
-      <Link to="/contact" className="font-bold text-gray-800 hover:text-blue-700">Contact Us</Link>
-      <Link to="/basket" className="font-bold text-gray-800 hover:text-blue-700">Basket</Link>
-    </>
-  );
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Menu items
+  const menuItems = [
+    { name: "Map", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Products", path: "/products" },
+    { name: "Gallery", path: "/gallery" },
+    { name: "Events", path: "/events" },
+    { name: "FAQ", path: "/faq" },
+    { name: "Contact Us", path: "/contact" },
+    { name: "Basket", path: "/basket" },
+  ];
 
   return (
     <ThemeProvider defaultTheme="light">
@@ -47,33 +53,38 @@ const App = () => {
           <CartProvider>
             <Toaster />
             <Sonner />
-
             <BrowserRouter>
-              <div className="flex min-h-screen">
-                {/* Sidebar for desktop */}
-                <aside className="hidden md:flex w-64 bg-white shadow-md p-6 flex-col gap-4 sticky top-0 h-screen">
-                  <h2 className="text-xl font-bold text-blue-700 mb-4">World Food Map</h2>
-                  <MenuLinks />
-                </aside>
+              <div className="flex h-screen">
 
-                {/* Mobile menu */}
-                <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow z-50 p-4 flex justify-between items-center">
-                  <h2 className="text-lg font-bold text-blue-700">World Food Map</h2>
-                  <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="text-2xl font-bold"
-                  >
-                    ☰
-                  </button>
-                  {mobileMenuOpen && (
-                    <div className="absolute top-full left-0 w-full bg-white shadow-md flex flex-col gap-2 p-4">
-                      <MenuLinks />
-                    </div>
-                  )}
+                {/* Sidebar */}
+                <div
+                  className={`
+                    bg-white shadow-md z-50
+                    ${isMobile ? "fixed top-0 left-0 w-full h-auto flex justify-between p-4" : "relative w-20 hover:w-56 transition-all duration-300"}
+                    flex flex-col
+                  `}
+                  onMouseEnter={() => !isMobile && setSidebarOpen(true)}
+                  onMouseLeave={() => !isMobile && setSidebarOpen(false)}
+                >
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className={`
+                        flex items-center gap-2 px-4 py-3 rounded-lg
+                        hover:bg-blue-100 hover:text-blue-800 transition-colors
+                        ${isMobile || sidebarOpen ? "justify-start" : "justify-center"}
+                      `}
+                    >
+                      <span className={isMobile || sidebarOpen ? "font-bold" : "sr-only"}>
+                        {item.name}
+                      </span>
+                    </Link>
+                  ))}
                 </div>
 
-                {/* Main content */}
-                <main className="flex-1 p-6 bg-gray-50 mt-16 md:mt-0">
+                {/* Main Content */}
+                <div className={`flex-1 overflow-auto ${isMobile ? "mt-20" : "ml-20"}`}>
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/basket" element={<Basket />} />
@@ -84,12 +95,14 @@ const App = () => {
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/contact" element={<ContactUs />} />
 
+                    {/* Village pages */}
                     <Route path="/village/:villageId" element={<VillageDetail />} />
                     <Route path="/story/:villageId" element={<StoryDetail />} />
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                </main>
+                </div>
+
               </div>
             </BrowserRouter>
           </CartProvider>
