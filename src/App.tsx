@@ -17,8 +17,8 @@ import Events from "./pages/Events";
 import FAQ from "./pages/FAQ";
 import ContactUs from "./pages/ContactUs";
 
-import VillageDetailWrapper from "./components/VillageDetailWrapper";
-import StoryDetailWrapper from "./components/StoryDetailWrapper";
+import VillageDetail from "./components/VillageDetail";
+import StoryDetail from "./components/StoryDetail";
 
 const queryClient = new QueryClient();
 
