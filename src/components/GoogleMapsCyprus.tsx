@@ -14,10 +14,10 @@ interface Village {
 
 const villages: Village[] = [
   { id: "1", name: "Lefkara", lat: 34.8667, lng: 33.3167, product: "Traditional Lace", url: "/products/lefkara" },
-  { id: "2", name: "Omodos", lat: 34.8417, lng: 32.7333, product: "Wine & Zivania", url: "/products/omodos" },
-  { id: "3", name: "Kakopetria", lat: 34.9833, lng: 32.9, product: "Honey & Preserves", url: "/products/kakopetria" },
-  { id: "4", name: "Platres", lat: 34.9167, lng: 32.8667, product: "Rose Products", url: "/products/platres" },
-  { id: "5", name: "Lania", lat: 34.8833, lng: 32.8, product: "Olive Oil", url: "/products/lania" },
+  { id: "2", name: "Omodos", lat: 34.8489, lng: 32.8078, product: "Wine & Zivania", url: "/products/omodos" },
+  { id: "3", name: "Kakopetria", lat: 34.9900, lng: 32.9037, product: "Honey & Preserves", url: "/products/kakopetria" },
+  { id: "4", name: "Platres", lat: 34.8880, lng: 32.8643, product: "Rose Products", url: "/products/platres" },
+  { id: "5", name: "Lania", lat: 34.8242, lng: 32.9208, product: "Olive Oil", url: "/products/lania" },
 ];
 
 interface Props {
