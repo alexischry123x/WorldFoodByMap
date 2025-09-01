@@ -1,6 +1,5 @@
-// src/components/GoogleMapsCyprus.tsx
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, OverlayView } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
@@ -29,7 +28,6 @@ const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
 
@@ -40,74 +38,67 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMapLoad = () => setMapLoaded(true);
-
   return (
     <div className="relative w-full max-w-6xl mx-auto">
-      {/* Title */}
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
         <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
         <span>Cyprus Food Map</span>
       </h1>
 
-      {/* Map */}
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
-            onLoad={handleMapLoad}
           >
-            {mapLoaded &&
-              villages.map((village) => {
-                const foodPin = {
-                  url: "/logo.png",
-                  scaledSize: new window.google.maps.Size(40, 40),
-                  anchor: new window.google.maps.Point(20, 40),
-                };
-
-                return (
+            {villages.map((village) => {
+              const foodPin = {
+                url: "/logo.png",
+                scaledSize: new window.google.maps.Size(40, 40),
+                anchor: new window.google.maps.Point(20, 40),
+              };
+              return (
+                <React.Fragment key={village.id}>
                   <Marker
-                    key={village.id}
                     position={{ lat: village.lat, lng: village.lng }}
+                    icon={foodPin}
                     onClick={() => onVillageClick(village)}
                     onMouseOver={() => setHoveredMarkerId(village.id)}
                     onMouseOut={() => setHoveredMarkerId(null)}
-                    icon={foodPin}
-                  >
-                    {hoveredMarkerId === village.id && (
-                      <InfoWindow position={{ lat: village.lat, lng: village.lng }}>
-                        <div>
-                          <strong>{village.product}</strong>
-                          <br />
-                          {village.name}
-                        </div>
-                      </InfoWindow>
-                    )}
-                  </Marker>
-                );
-              })}
+                  />
+                  {hoveredMarkerId === village.id && (
+                    <OverlayView
+                      position={{ lat: village.lat, lng: village.lng }}
+                      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                    >
+                      <div className="bg-white rounded-lg shadow-lg p-2 text-center whitespace-nowrap">
+                        <div className="font-bold">{village.product}</div>
+                        <div>{village.name}</div>
+                      </div>
+                    </OverlayView>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </GoogleMap>
         </LoadScript>
       </div>
 
-      {/* Pins below the map */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
         {villages.map((village) => (
           <button
             key={village.id}
             onClick={() => onVillageClick(village)}
-            title={village.product} // tooltip on hover
+            title={village.product}
             className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
           >
-            <div className="font-bold text-gray-800 mb-1">{village.product}</div>
-            <div className="text-sm text-gray-600">{village.name}</div>
+            <div className="text-lg font-bold mb-1">{village.product}</div>
+            <div className="text-sm text-gray-800">{village.name}</div>
           </button>
         ))}
       </div>
 
-      {/* Bottom info text */}
       <div className="mt-6 text-center">
         <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
           Click on any village to discover authentic Cypriot products! 🏺
