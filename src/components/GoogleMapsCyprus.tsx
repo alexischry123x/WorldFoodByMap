@@ -1,6 +1,6 @@
 // src/components/GoogleMapsCyprus.tsx
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
