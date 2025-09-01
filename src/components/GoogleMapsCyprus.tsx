@@ -75,16 +75,16 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                         onMouseOut={() => setHoveredMarkerId(null)}
                       />
                       {hoveredMarkerId === village.id && (
-                        <OverlayView
-                          position={{ lat: village.lat, lng: village.lng }}
-                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                        >
-                          <div className="bg-white rounded-lg shadow-lg p-2 text-center whitespace-nowrap">
-                            <div className="font-bold">{village.product}</div>
-                            <div>{village.name}</div>
-                          </div>
-                        </OverlayView>
-                      )}
+  <OverlayView
+    position={{ lat: village.lat, lng: village.lng }}
+    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+  >
+    <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
+      <div className="font-bold">{village.product}</div>
+      <div>{village.name}</div>
+    </div>
+  </OverlayView>
+)}
                     </React.Fragment>
                   );
                 })}
