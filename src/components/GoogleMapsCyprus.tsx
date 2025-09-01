@@ -1,4 +1,4 @@
-
+// src/components/GoogleMapsCyprus.tsx
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
@@ -25,11 +25,9 @@ interface Props {
 }
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
-const webCenter = { lat: 35.0, lng: 33.0 };
-const mobileCenter = { lat: 34.95, lng: 32.95 };
+const defaultCenter = { lat: 34.9, lng: 32.9 }; // Centered for all devices
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -38,8 +36,6 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const handleMapLoad = () => setMapLoaded(true);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -54,26 +50,25 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
             mapContainerStyle={containerStyle}
-            center={isMobile ? mobileCenter : webCenter}
+            center={defaultCenter}
             zoom={isMobile ? 9 : 10}
-            onLoad={handleMapLoad}
           >
-            {mapLoaded &&
-              villages.map((village) => {
-                const foodPin = {
-                  url: "/logo.png",
-                  scaledSize: new window.google.maps.Size(40, 40),
-                  anchor: new window.google.maps.Point(20, 40),
-                };
-                return (
-                  <Marker
-                    key={village.id}
-                    position={{ lat: village.lat, lng: village.lng }}
-                    onClick={() => onVillageClick(village)}
-                    icon={foodPin}
-                  />
-                );
-              })}
+            {villages.map((village) => {
+              const foodPin = {
+                url: "/logo.png",
+                scaledSize: new window.google.maps.Size(40, 40),
+                anchor: new window.google.maps.Point(20, 40),
+              };
+              return (
+                <Marker
+                  key={village.id}
+                  position={{ lat: village.lat, lng: village.lng }}
+                  onClick={() => onVillageClick(village)}
+                  icon={foodPin}
+                  title={village.product} // Tooltip on hover
+                />
+              );
+            })}
           </GoogleMap>
         </LoadScript>
       </div>
@@ -85,10 +80,10 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             key={village.id}
             onClick={() => onVillageClick(village)}
             className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
+            title={village.product} // Tooltip on hover
           >
-            <div className="text-2xl mb-2">📍</div>
-            <div className="font-bold text-gray-800">{village.name}</div>
-            <div className="text-sm text-gray-600">{village.product}</div>
+            <div className="font-bold text-gray-800 mb-1">{village.product}</div>
+            <div className="text-sm text-gray-600">{village.name}</div>
           </button>
         ))}
       </div>
