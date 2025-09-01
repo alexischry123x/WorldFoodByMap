@@ -1,4 +1,3 @@
-// src/pages/Events.tsx
 import React from "react";
 
 const Events: React.FC = () => {
