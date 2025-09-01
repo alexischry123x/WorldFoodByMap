@@ -1,82 +1,59 @@
-// App.tsx
-import { Toaster } from "@/components/ui/toaster"; 
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { ThemeProvider } from "@/components/theme-provider";
-import { CartProvider } from "./components/CartContext";
-
 import Index from "./pages/Index";
 import Basket from "./pages/Basket";
 import NotFound from "./pages/NotFound";
-
 import About from "./pages/About";
 import Products from "./pages/Products";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
 import FAQ from "./pages/FAQ";
 import ContactUs from "./pages/ContactUs";
-
 import VillageDetail from "./components/VillageDetail";
 import StoryDetail from "./components/StoryDetail";
-import GoogleMapsCyprus from "./components/GoogleMapsCyprus";
 
-import { useState } from "react";
+const App = () => (
+  <ThemeProvider defaultTheme="light">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
 
-const queryClient = new QueryClient();
+          {/* Router wraps everything */}
+          <BrowserRouter>
+            {/* Navigation */}
+            <nav className="bg-white shadow-md p-4 flex justify-center gap-6 sticky top-0 z-50">
+              <Link to="/" className="font-bold text-blue-700 hover:text-blue-900">Map</Link>
+              <Link to="/about" className="font-bold text-blue-700 hover:text-blue-900">About</Link>
+              <Link to="/products" className="font-bold text-blue-700 hover:text-blue-900">Products</Link>
+              <Link to="/gallery" className="font-bold text-blue-700 hover:text-blue-900">Gallery</Link>
+              <Link to="/events" className="font-bold text-blue-700 hover:text-blue-900">Events</Link>
+              <Link to="/faq" className="font-bold text-blue-700 hover:text-blue-900">FAQ</Link>
+              <Link to="/contact" className="font-bold text-blue-700 hover:text-blue-900">Contact Us</Link>
+              <Link to="/basket" className="font-bold text-blue-700 hover:text-blue-900">Basket</Link>
+            </nav>
 
-const App = () => {
-  const [currentCountry, setCurrentCountry] = useState("Cyprus");
+            {/* Routes */}
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/basket" element={<Basket />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<ContactUs />} />
 
-  return (
-    <ThemeProvider defaultTheme="light">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
+              <Route path="/village/:villageId" element={<VillageDetail />} />
+              <Route path="/story/:villageId" element={<StoryDetail />} />
 
-            <div className="flex h-screen">
-              {/* Sidebar */}
-              <nav className="bg-white shadow-md w-64 p-6 flex flex-col justify-start">
-                <h2 className="text-xl font-bold mb-6">{currentCountry} Food Map</h2>
-                <Link to="/" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">Map</Link>
-                <Link to="/about" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">About</Link>
-                <Link to="/products" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">Products</Link>
-                <Link to="/gallery" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">Gallery</Link>
-                <Link to="/events" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">Events</Link>
-                <Link to="/faq" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">FAQ</Link>
-                <Link to="/contact" className="mb-3 text-blue-700 hover:text-blue-900 font-semibold">Contact Us</Link>
-                <Link to="/basket" className="mt-auto text-blue-700 hover:text-blue-900 font-semibold">Basket</Link>
-              </nav>
-
-              {/* Main content */}
-              <div className="flex-1 overflow-auto">
-                <BrowserRouter>
-                  <Routes>
-                    <Route path="/" element={
-                      <GoogleMapsCyprus onCountryHover={(country) => setCurrentCountry(country)} />
-                    } />
-                    <Route path="/basket" element={<Basket />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/gallery" element={<Gallery />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/faq" element={<FAQ />} />
-                    <Route path="/contact" element={<ContactUs />} />
-                    <Route path="/village/:villageId" element={<VillageDetail />} />
-                    <Route path="/story/:villageId" element={<StoryDetail />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </BrowserRouter>
-              </div>
-            </div>
-          </CartProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
-  );
-};
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
+);
 
 export default App;
