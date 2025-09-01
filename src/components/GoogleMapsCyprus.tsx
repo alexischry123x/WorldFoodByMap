@@ -27,12 +27,20 @@ const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-// Rough rectangle covering neighboring regions outside Cyprus
-const greyOutsideBounds = [
-  { lat: 36.5, lng: 35.5 },
-  { lat: 31.5, lng: 35.5 },
-  { lat: 31.5, lng: 30.0 },
-  { lat: 36.5, lng: 30.0 },
+// Big rectangle covering the whole world (outer polygon)
+const worldBounds = [
+  { lat: 90, lng: -180 },
+  { lat: -90, lng: -180 },
+  { lat: -90, lng: 180 },
+  { lat: 90, lng: 180 },
+];
+
+// Rough polygon around Cyprus (hole) to keep it visible
+const cyprusBounds = [
+  { lat: 35.7, lng: 32.2 },
+  { lat: 34.55, lng: 32.2 },
+  { lat: 34.55, lng: 34.0 },
+  { lat: 35.7, lng: 34.0 },
 ];
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
@@ -68,9 +76,9 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           >
             {mapLoaded && window.google && (
               <>
-                {/* Grey overlay outside Cyprus */}
+                {/* Grey overlay with a hole for Cyprus */}
                 <Polygon
-                  paths={greyOutsideBounds}
+                  paths={[worldBounds, cyprusBounds]} // first = outer, second = hole
                   options={{
                     fillColor: "#d3d3d3",
                     fillOpacity: 0.6,
@@ -79,9 +87,9 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   }}
                 />
 
-                {/* Coming Soon Label */}
+                {/* "Coming Soon" label outside Cyprus */}
                 <OverlayView
-                  position={{ lat: 34.9, lng: 31.0 }}
+                  position={{ lat: 34.0, lng: 32.0 }}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
                   <div className="text-4xl font-bold text-gray-400 select-none pointer-events-none">
@@ -89,7 +97,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   </div>
                 </OverlayView>
 
-                {/* Village Markers */}
+                {/* Village markers */}
                 {villages.map((village) => (
                   <React.Fragment key={village.id}>
                     <Marker
