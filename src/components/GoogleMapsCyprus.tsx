@@ -45,7 +45,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     <div className="relative w-full max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
         <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
-        <span>Cyprus Food By Map</span>
+        <span>Cyprus Food Map</span>
       </h1>
 
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
