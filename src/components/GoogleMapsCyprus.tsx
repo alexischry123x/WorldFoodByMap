@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, OverlayView } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, OverlayView, Polygon } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
@@ -27,11 +27,12 @@ const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-// Grey-out style for world except Cyprus
-const mapStyles: google.maps.MapTypeStyle[] = [
-  { featureType: "all", elementType: "geometry", stylers: [{ color: "#d3d3d3" }] },
-  { featureType: "administrative.country", elementType: "geometry.fill", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#a0c4ff" }] } // blue water
+// Rough rectangle covering neighboring regions outside Cyprus
+const greyOutsideBounds = [
+  { lat: 36.5, lng: 35.5 },
+  { lat: 31.5, lng: 35.5 },
+  { lat: 31.5, lng: 30.0 },
+  { lat: 36.5, lng: 30.0 },
 ];
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
@@ -46,21 +47,18 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMapLoad = (map: google.maps.Map) => {
-    setMapLoaded(true);
-    const styledMap = new google.maps.StyledMapType(mapStyles, { name: "Styled Map" });
-    map.mapTypes.set("styled_map", styledMap);
-    map.setMapTypeId("styled_map");
-  };
+  const handleMapLoad = () => setMapLoaded(true);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
+      {/* Title */}
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
         <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
         <span>Cyprus Food Map</span>
       </h1>
 
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+      {/* Map */}
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -70,50 +68,79 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           >
             {mapLoaded && window.google && (
               <>
-                {villages.map((village) => {
-                  const foodPin = {
-                    url: "/logo.png",
-                    scaledSize: new window.google.maps.Size(40, 40),
-                    anchor: new window.google.maps.Point(20, 40),
-                  };
+                {/* Grey overlay outside Cyprus */}
+                <Polygon
+                  paths={greyOutsideBounds}
+                  options={{
+                    fillColor: "#d3d3d3",
+                    fillOpacity: 0.6,
+                    strokeOpacity: 0,
+                    clickable: false,
+                  }}
+                />
 
-                  return (
-                    <React.Fragment key={village.id}>
-                      <Marker
-                        position={{ lat: village.lat, lng: village.lng }}
-                        icon={foodPin}
-                        onClick={() => onVillageClick(village)}
-                        onMouseOver={() => setHoveredMarkerId(village.id)}
-                        onMouseOut={() => setHoveredMarkerId(null)}
-                      />
-                      {hoveredMarkerId === village.id && (
-                        <OverlayView
-                          position={{ lat: village.lat, lng: village.lng }}
-                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                        >
-                          <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
-                            <div className="font-bold">{village.product}</div>
-                            <div>{village.name}</div>
-                          </div>
-                        </OverlayView>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-
-                {/* Coming Soon overlay outside Cyprus */}
+                {/* Coming Soon Label */}
                 <OverlayView
-                  position={{ lat: 35.0, lng: 30.0 }} // approximate center of greyed area
+                  position={{ lat: 34.9, lng: 31.0 }}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
                   <div className="text-4xl font-bold text-gray-400 select-none pointer-events-none">
                     Coming Soon 🌍
                   </div>
                 </OverlayView>
+
+                {/* Village Markers */}
+                {villages.map((village) => (
+                  <React.Fragment key={village.id}>
+                    <Marker
+                      position={{ lat: village.lat, lng: village.lng }}
+                      icon={{
+                        url: "/logo.png",
+                        scaledSize: new window.google.maps.Size(40, 40),
+                        anchor: new window.google.maps.Point(20, 40),
+                      }}
+                      onClick={() => onVillageClick(village)}
+                      onMouseOver={() => setHoveredMarkerId(village.id)}
+                      onMouseOut={() => setHoveredMarkerId(null)}
+                    />
+                    {hoveredMarkerId === village.id && (
+                      <OverlayView
+                        position={{ lat: village.lat, lng: village.lng }}
+                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                      >
+                        <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
+                          <div className="font-bold">{village.product}</div>
+                          <div>{village.name}</div>
+                        </div>
+                      </OverlayView>
+                    )}
+                  </React.Fragment>
+                ))}
               </>
             )}
           </GoogleMap>
         </LoadScript>
+      </div>
+
+      {/* Bottom buttons */}
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+        {villages.map((village) => (
+          <button
+            key={village.id}
+            onClick={() => onVillageClick(village)}
+            title={village.product}
+            className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
+          >
+            <div className="text-lg font-bold mb-1">{village.product}</div>
+            <div className="text-sm text-gray-800">{village.name}</div>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 text-center">
+        <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
+          Click on any village to discover authentic Cypriot products! 🏺
+        </p>
       </div>
     </div>
   );
