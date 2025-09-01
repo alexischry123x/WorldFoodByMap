@@ -21,15 +21,20 @@ const villages: Village[] = [
 
 interface Props {
   onVillageClick: (village: Village) => void;
-  onCountryHover?: (country: string) => void; // optional callback to update country title
-  country?: string; // current country name
 }
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick, onCountryHover, country = "Cyprus" }) => {
+// Grey-out style for world except Cyprus
+const mapStyles: google.maps.MapTypeStyle[] = [
+  { featureType: "all", elementType: "geometry", stylers: [{ color: "#d3d3d3" }] },
+  { featureType: "administrative.country", elementType: "geometry.fill", stylers: [{ visibility: "off" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#a0c4ff" }] } // blue water
+];
+
+const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -41,27 +46,27 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick, onCountryHover, cou
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMapLoad = () => setMapLoaded(true);
-
-  const handleCountryHover = () => {
-    if (onCountryHover) onCountryHover(country);
+  const handleMapLoad = (map: google.maps.Map) => {
+    setMapLoaded(true);
+    const styledMap = new google.maps.StyledMapType(mapStyles, { name: "Styled Map" });
+    map.mapTypes.set("styled_map", styledMap);
+    map.setMapTypeId("styled_map");
   };
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-white mb-6 text-center drop-shadow-lg flex items-center justify-center space-x-2">
-        <img src={cyFlag} alt={`${country} Flag`} className="h-8 w-8 rounded-sm" />
-        <span>{country} Food Map</span>
+        <img src={cyFlag} alt="Cyprus Flag" className="h-8 w-8 rounded-sm" />
+        <span>Cyprus Food Map</span>
       </h1>
 
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl">
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
             onLoad={handleMapLoad}
-            onMouseOver={handleCountryHover} // update title when mouse enters the map
           >
             {mapLoaded && window.google && (
               <>
@@ -95,30 +100,20 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick, onCountryHover, cou
                     </React.Fragment>
                   );
                 })}
+
+                {/* Coming Soon overlay outside Cyprus */}
+                <OverlayView
+                  position={{ lat: 35.0, lng: 30.0 }} // approximate center of greyed area
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div className="text-4xl font-bold text-gray-400 select-none pointer-events-none">
+                    Coming Soon 🌍
+                  </div>
+                </OverlayView>
               </>
             )}
           </GoogleMap>
         </LoadScript>
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
-        {villages.map((village) => (
-          <button
-            key={village.id}
-            onClick={() => onVillageClick(village)}
-            title={village.product}
-            className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
-          >
-            <div className="text-lg font-bold mb-1">{village.product}</div>
-            <div className="text-sm text-gray-800">{village.name}</div>
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 text-center">
-        <p className="inline-block bg-black/50 text-white text-lg font-medium drop-shadow px-4 py-2 rounded">
-          Click on any village to discover authentic {country} products! 🏺
-        </p>
       </div>
     </div>
   );
