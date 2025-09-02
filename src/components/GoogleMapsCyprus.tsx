@@ -41,21 +41,35 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   const handleMapLoad = () => setMapLoaded(true);
 
-  // --- MASK: world polygon with a hole (Cyprus bbox) ---
-  // Outer ring MUST be clockwise; inner "hole" MUST be counterclockwise.
-  const outerWorldCW = [
-    { lat: 85,  lng: -179.999 },
-    { lat: 85,  lng:  179.999 },
-    { lat: -85, lng:  179.999 },
-    { lat: -85, lng: -179.999 },
-  ];
-  // A loose rectangle around Cyprus (expand as you like)
-  const cyprusBoxCCW = [
-    { lat: 35.80, lng: 32.00 }, // top-left
-    { lat: 34.50, lng: 32.00 }, // bottom-left
-    { lat: 34.50, lng: 34.20 }, // bottom-right
-    { lat: 35.80, lng: 34.20 }, // top-right
-  ];
+ const cyprusCoords = [
+  [
+    { lat: 35.1731, lng: 32.7312 },
+    { lat: 35.1731, lng: 34.0049 },
+    { lat: 34.5634, lng: 34.0049 },
+    { lat: 34.5634, lng: 32.7312 },
+    { lat: 35.1731, lng: 32.7312 },
+  ],
+];
+
+// Outer world polygon (big rectangle)
+const worldCoords = [
+  { lat: 85, lng: -179.999 },
+  { lat: 85, lng: 179.999 },
+  { lat: -85, lng: 179.999 },
+  { lat: -85, lng: -179.999 },
+];
+
+// Polygon with a hole: world (CW) - Cyprus (CCW)
+<Polygon
+  paths={[worldCoords, cyprusCoords[0]]}
+  options={{
+    fillColor: "#808080",
+    fillOpacity: 0.5,
+    strokeOpacity: 0,
+    clickable: false,
+    zIndex: 1,
+  }}
+/>
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
