@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { villageData } from "./villageData";
-import ProductPurchase from "../pages/ProductPurchase";
+import ProductPurchase from "./ProductPurchase";
 
 const VillageDetail: React.FC = () => {
   const { villageId } = useParams<{ villageId: string }>();
