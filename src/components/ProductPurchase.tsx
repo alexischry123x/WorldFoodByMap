@@ -1,3 +1,4 @@
+// src/pages/ProductPurchase.tsx
 import React, { useState } from 'react';
 import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,8 +20,8 @@ const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
   const village = villageData[productId];
   if (!village) return <div>Product not found</div>;
 
-  // Use numeric price for calculation (take min value if price range)
-  const numericPrice = Number(village.price.replace(/[^0-9.-]+/g,"").split('-')[0]) || 25;
+  // Convert price string (range) to numeric value (take min if range)
+  const numericPrice = Number(village.price.replace(/[^0-9.-]+/g, "").split('-')[0]) || 25;
 
   const handleAddToCart = () => {
     addToCart({
@@ -29,11 +30,11 @@ const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
       price: numericPrice,
       quantity,
     });
-    alert(`Added ${quantity} ${village.product}(s) to your basket!`);
+    alert(`Added ${quantity} × ${village.product} to your basket!`);
   };
 
   const handlePurchase = () => {
-    alert('Thank you! Your order has been placed. You will receive a confirmation email shortly.');
+    alert('Thank you! Your order has been placed. A confirmation email will follow shortly.');
     onBack();
   };
 
@@ -62,9 +63,9 @@ const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
                 <span>Quantity:</span>
                 <Input 
                   type="number" 
-                  min="1" 
+                  min={1} 
                   value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   className="w-20"
                 />
               </div>
@@ -108,7 +109,7 @@ const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
               </div>
             </div>
 
-            {/* Buttons */}
+            {/* Add to Cart Button */}
             <Button
               onClick={handleAddToCart}
               className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-lg"
@@ -116,6 +117,7 @@ const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
               🛒 Add to Basket
             </Button>
 
+            {/* Complete Purchase Button */}
             <Button
               onClick={handlePurchase}
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 text-lg"
