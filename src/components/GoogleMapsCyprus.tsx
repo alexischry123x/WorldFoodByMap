@@ -41,7 +41,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   const handleMapLoad = () => setMapLoaded(true);
 
-  // Large rectangle covering the whole world
+  // World bounding box
   const worldCoords = [
     { lat: 85, lng: -179.999 },
     { lat: 85, lng: 179.999 },
@@ -49,7 +49,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     { lat: -85, lng: -179.999 },
   ];
 
-  // Approximate polygon of Cyprus island (simplified shape)
+  // Approximate polygon of Cyprus island (simplified outline)
   const cyprusCoords = [
     { lat: 35.1731, lng: 32.7312 },
     { lat: 35.1900, lng: 32.8500 },
@@ -64,7 +64,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     { lat: 34.6500, lng: 33.6000 },
     { lat: 34.6000, lng: 33.3000 },
     { lat: 34.5634, lng: 32.7312 },
-    { lat: 35.1731, lng: 32.7312 }, // back to start
+    { lat: 35.1731, lng: 32.7312 },
   ];
 
   return (
@@ -84,9 +84,9 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           >
             {mapLoaded && (window as any).google && (
               <>
-                {/* Grey out the whole world except the Cyprus polygon (hole) */}
+                {/* Grey overlay for rest of the world, with a HOLE over Cyprus */}
                 <Polygon
-                  paths={[worldCoords, cyprusCoords]}
+                  paths={[worldCoords, cyprusCoords]} // CY acts as a hole
                   options={{
                     fillColor: "#808080",
                     fillOpacity: 0.6,
@@ -96,7 +96,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                   }}
                 />
 
-                {/* Markers for villages */}
+                {/* Village markers */}
                 {villages.map((village) => {
                   const foodPin = {
                     url: "/logo.png",
@@ -131,25 +131,10 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
           </GoogleMap>
         </LoadScript>
 
-        {/* Floating badge inside the map container */}
+        {/* "Coming soon" badge */}
         <div className="absolute top-3 right-3 bg-black/60 text-white px-3 py-1.5 rounded-md text-sm z-10">
           🌍 Other countries coming soon…
         </div>
-      </div>
-
-      {/* Bottom buttons */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
-        {villages.map((village) => (
-          <button
-            key={village.id}
-            onClick={() => onVillageClick(village)}
-            title={village.product}
-            className="bg-white/90 hover:bg-white p-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 text-center"
-          >
-            <div className="text-lg font-bold mb-1">{village.product}</div>
-            <div className="text-sm text-gray-800">{village.name}</div>
-          </button>
-        ))}
       </div>
     </div>
   );
