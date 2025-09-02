@@ -1,21 +1,16 @@
 // src/pages/Products.tsx
 import React, { useState } from "react";
-import { villageData } from "../data/villageData";
+import { villageData } from "../components/villageData";
 import ProductPurchase from "./ProductPurchase";
 
 const Products: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
-  const handleBack = () => setSelectedProductId(null);
-
-  // Show ProductPurchase when a product is selected
   if (selectedProductId) {
-    const village = villageData[selectedProductId];
     return (
       <ProductPurchase
-        productId={village.id}
-        productName={village.product}
-        onBack={handleBack}
+        productId={selectedProductId}
+        onBack={() => setSelectedProductId(null)}
       />
     );
   }
@@ -29,7 +24,7 @@ const Products: React.FC = () => {
             <div
               key={village.id}
               onClick={() => setSelectedProductId(village.id)}
-              className="bg-white/90 p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform cursor-pointer"
+              className="cursor-pointer bg-white/90 p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform"
             >
               <h2 className="text-2xl font-bold text-green-700">{village.product}</h2>
               <p className="text-gray-700">{village.name}</p>
