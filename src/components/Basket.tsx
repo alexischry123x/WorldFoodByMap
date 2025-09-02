@@ -1,7 +1,6 @@
-// src/components/Basket.tsx
-import React from 'react';
-import { useCart } from './CartContext';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { useCart } from "./CartContext";
+import { Link } from "react-router-dom";
 
 const Basket: React.FC = () => {
   const { cart } = useCart();
@@ -14,7 +13,7 @@ const Basket: React.FC = () => {
       title="View Basket"
     >
       <span role="img" aria-label="basket" className="text-xl">🛒</span>
-      <span className="font-semibold">{totalItems} item{totalItems !== 1 ? 's' : ''}</span>
+      <span className="font-semibold">{totalItems} item{totalItems !== 1 ? "s" : ""}</span>
     </Link>
   );
 };
