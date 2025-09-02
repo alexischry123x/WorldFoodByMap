@@ -13,7 +13,7 @@ const AppLayout: React.FC = () => {
     <div>
       {/* Header with World Food Map */}
       <header className="p-4 flex justify-between items-center bg-white shadow">
-        <h1 className="text-xl font-bold">🌎 World Food Map</h1>
+        <h1 className="text-xl font-bold">🌎 World Food By Map</h1>
         <div
           className="cursor-pointer text-lg font-semibold"
           onClick={() => navigate("/basket")}
