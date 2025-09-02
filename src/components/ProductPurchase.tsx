@@ -4,26 +4,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCart } from "../components/CartContext";
+import { villageData } from "../components/villageData";
 
 interface Props {
-  productId: string;   // ✅ changed from villageId
-  productName: string; // ✅ added for clarity
+  productId: string;   // id from villageData
   onBack: () => void;
 }
 
-const ProductPurchase: React.FC<Props> = ({ productId, productName, onBack }) => {
+const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
   const [quantity, setQuantity] = useState(1);
   const [email, setEmail] = useState('');
   const { addToCart } = useCart();
 
+  const village = villageData[productId];
+  if (!village) return <div>Product not found</div>;
+
+  // Use numeric price for calculation (take min value if price range)
+  const numericPrice = Number(village.price.replace(/[^0-9.-]+/g,"").split('-')[0]) || 25;
+
   const handleAddToCart = () => {
     addToCart({
-      id: productId,
-      name: productName,
-      price: 25, // ideally pass price as prop too
+      id: village.id,
+      name: village.product,
+      price: numericPrice,
       quantity,
     });
-    alert(`Added ${quantity} ${productName}(s) to your basket!`);
+    alert(`Added ${quantity} ${village.product}(s) to your basket!`);
   };
 
   const handlePurchase = () => {
@@ -64,7 +70,7 @@ const ProductPurchase: React.FC<Props> = ({ productId, productName, onBack }) =>
               </div>
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total:</span>
-                <span className="text-green-600">€{(25 * quantity).toFixed(2)}</span>
+                <span className="text-green-600">€{(numericPrice * quantity).toFixed(2)}</span>
               </div>
             </div>
 
