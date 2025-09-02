@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, OverlayView } from "@react-google-maps/api";
+import { debounce } from "lodash";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
@@ -27,8 +28,8 @@ const containerStyle = {
   width: "100%",
   height: "600px",
   borderRadius: "1rem",
-  position: "relative",
-  overflow: "hidden",
+  position: "relative" as const,
+  overflow: "hidden" as const,
 };
 
 const fullWorldCenter = { lat: 20, lng: 0 };
@@ -43,6 +44,7 @@ const grayMapStyle = [
   },
 ];
 
+// Approximate Cyprus polygon clip-path points (percentages relative to container)
 const cyprusPolygonPointsCSS = [
   [50, 20],
   [52, 25],
@@ -58,39 +60,63 @@ const cyprusPolygonPointsCSS = [
   [27, 35],
   [25, 20],
 ];
-const clipPathPolygon = `polygon(${cyprusPolygonPointsCSS
-  .map((p) => `${p[0]}% ${p[1]}%`)
-  .join(", ")})`;
+const clipPathPolygon = `polygon(${cyprusPolygonPointsCSS.map(p => `${p[0]}% ${p[1]}%`).join(", ")})`;
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [zoom, setZoom] = useState<number>(cyprusZoomDefault);
-  const [center, setCenter] = useState(cyprusCenter);
+  const [center, setCenter] = useState<{ lat: number; lng: number }>(cyprusCenter);
 
-  // Refs for top & bottom map instances to sync zoom/center if desired (optional)
   const topMapRef = useRef<google.maps.Map | null>(null);
   const bottomMapRef = useRef<google.maps.Map | null>(null);
 
+  // Debounced state setters to avoid React render flood (200ms delay)
+  const debouncedSetZoom = useRef(
+    debounce((newZoom: number) => {
+      setZoom(newZoom);
+    }, 200)
+  ).current;
+
+  const debouncedSetCenter = useRef(
+    debounce((lat: number, lng: number) => {
+      setCenter((prev) => {
+        if (Math.abs(prev.lat - lat) < 1e-6 && Math.abs(prev.lng - lng) < 1e-6) return prev;
+        return { lat, lng };
+      });
+    }, 200)
+  ).current;
+
+  // Zoom changed handler on top map
   const onZoomChangedTop = useCallback(() => {
     if (topMapRef.current) {
       const currentZoom = topMapRef.current.getZoom();
-      if (currentZoom !== undefined && currentZoom !== zoom) {
-        setZoom(currentZoom);
+      if (typeof currentZoom === "number") {
+        debouncedSetZoom(currentZoom);
       }
     }
-  }, [zoom]);
+  }, [debouncedSetZoom]);
 
+  // Center changed handler on top map
   const onCenterChangedTop = useCallback(() => {
     if (topMapRef.current) {
       const newCenter = topMapRef.current.getCenter();
       if (newCenter) {
-        setCenter({
-          lat: newCenter.lat(),
-          lng: newCenter.lng(),
-        });
+        const lat = newCenter.lat();
+        const lng = newCenter.lng();
+        debouncedSetCenter(lat, lng);
       }
     }
-  }, []);
+  }, [debouncedSetCenter]);
+
+  useEffect(() => {
+    return () => {
+      // On unmount cancel debounced calls to avoid state updates on unmounted
+      debouncedSetCenter.cancel();
+      debouncedSetZoom.cancel();
+    };
+  }, [debouncedSetCenter, debouncedSetZoom]);
+
+  const isZoomedOut = zoom < zoomThreshold;
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -111,8 +137,8 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
               top: 0,
               left: 0,
               transition: "opacity 0.3s ease",
-              opacity: zoom < zoomThreshold ? 1 : 0,
-              pointerEvents: zoom < zoomThreshold ? "auto" : "none",
+              opacity: isZoomedOut ? 1 : 0,
+              pointerEvents: isZoomedOut ? "auto" : "none",
               zIndex: 1,
             }}
             center={fullWorldCenter}
@@ -123,11 +149,11 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
               streetViewControl: false,
               mapTypeControl: false,
               clickableIcons: false,
-              gestureHandling: zoom < zoomThreshold ? "auto" : "none",
+              gestureHandling: isZoomedOut ? "auto" : "none",
             }}
           />
 
-          {/* Top colored Cyprus map always rendered */}
+          {/* Top colored Cyprus map always rendered with clip-path on zoom out */}
           <div
             style={{
               position: "absolute",
@@ -136,10 +162,10 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
               width: "100%",
               height: "100%",
               transition: "opacity 0.3s ease",
-              opacity: zoom < zoomThreshold ? 1 : 1,
-              pointerEvents: zoom < zoomThreshold ? "auto" : "auto",
-              clipPath: zoom < zoomThreshold ? clipPathPolygon : "none", // clip only when zoomed out
-              WebkitClipPath: zoom < zoomThreshold ? clipPathPolygon : "none",
+              opacity: 1,
+              pointerEvents: "auto",
+              clipPath: isZoomedOut ? clipPathPolygon : "none",
+              WebkitClipPath: isZoomedOut ? clipPathPolygon : "none",
               zIndex: 2,
             }}
           >
@@ -160,7 +186,7 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
                 mapTypeControl: false,
                 zoomControl: true,
                 gestureHandling: "greedy",
-                restriction: zoom < zoomThreshold
+                restriction: isZoomedOut
                   ? {
                       latLngBounds: {
                         north: 35.6,
