@@ -1,85 +1,34 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useCart } from "../components/CartContext";
+// src/pages/BasketPage.tsx
+import React from 'react';
+import { useCart } from '../components/CartContext';
+import { Button } from '@/components/ui/button';
 
 const BasketPage: React.FC = () => {
-  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  if (cart.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Your basket is empty 🛒</h1>
-        <Link
-          to="/products"
-          className="text-blue-600 hover:underline font-semibold"
-        >
-          Browse products
-        </Link>
-      </div>
-    );
-  }
+  if (cart.length === 0) return <div className="p-6 text-center">Your basket is empty.</div>;
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-2xl p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Your Basket</h1>
-
-        <ul className="divide-y divide-gray-200">
-          {cart.map((item) => (
-            <li key={item.id} className="flex justify-between items-center py-4">
-              <div>
-                <h2 className="text-lg font-semibold">{item.name}</h2>
-                <p className="text-gray-500">
-                  {item.quantity} × €{item.price.toFixed(2)}
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() =>
-                    updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                  }
-                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                >
-                  -
-                </button>
-                <span className="font-semibold">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                >
-                  +
-                </button>
-
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="ml-4 text-red-500 hover:underline"
-                >
-                  Remove
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-6 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Total: €{totalPrice.toFixed(2)}</h2>
-          <div className="space-x-4">
-            <button
-              onClick={clearCart}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-            >
-              Clear Basket
-            </button>
-            <button
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
-              Checkout
-            </button>
+    <div className="min-h-screen p-6 bg-green-50">
+      <h1 className="text-3xl font-bold text-green-800 mb-6">🛒 Your Basket</h1>
+      <div className="space-y-4 max-w-3xl mx-auto">
+        {cart.map(item => (
+          <div key={item.id} className="flex justify-between items-center bg-white rounded-xl p-4 shadow">
+            <div>
+              <div className="font-semibold">{item.name}</div>
+              <div>€{item.price.toFixed(2)} × {item.quantity}</div>
+            </div>
+            <div>
+              <Button onClick={() => removeFromCart(item.id)} className="bg-red-500 hover:bg-red-600 text-white">Remove</Button>
+            </div>
           </div>
+        ))}
+        <div className="flex justify-between font-bold text-lg mt-4">
+          <span>Total:</span>
+          <span>€{total.toFixed(2)}</span>
         </div>
+        <Button onClick={clearCart} className="w-full bg-blue-500 hover:bg-blue-600 text-white">Clear Basket</Button>
       </div>
     </div>
   );
