@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { CartProvider, useCart } from "./components/CartContext";
+import { CartProvider } from "./components/CartContext";
 
 import Index from "./pages/Index";
 import BasketPage from "./pages/Basket";
@@ -18,34 +18,12 @@ import FAQ from "./pages/FAQ";
 import ContactUs from "./pages/ContactUs";
 import VillageDetail from "./components/VillageDetail";
 import StoryDetail from "./components/StoryDetail";
+import Basket from "./components/Basket"; // floating basket icon
 
 const queryClient = new QueryClient();
 
-// Basket icon component visible on all pages
-const Basket: React.FC = () => {
-  const { cart } = useCart();
-
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  return (
-    <Link
-      to="/basket"
-      className="fixed top-4 right-4 bg-white shadow-lg rounded-lg px-4 py-2 flex items-center space-x-2 cursor-pointer z-50"
-      title="View Basket"
-    >
-      <span role="img" aria-label="basket" className="text-xl">
-        🛒
-      </span>
-      <span className="font-semibold">
-        {totalItems} item{totalItems !== 1 ? "s" : ""}
-      </span>
-    </Link>
-  );
-};
-
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
 
   const menuItems = [
@@ -84,7 +62,7 @@ const App: React.FC = () => {
                 </nav>
               </div>
 
-              {/* Mobile top bar */}
+              {/* Mobile Top Bar */}
               <div className="md:hidden flex justify-between items-center bg-white shadow p-4 sticky top-0 z-50">
                 <div className="text-xl font-bold">World Food Map</div>
                 <button
@@ -112,7 +90,7 @@ const App: React.FC = () => {
                 </div>
               )}
 
-              {/* Basket icon visible on all pages */}
+              {/* Floating Basket Icon */}
               <Basket />
 
               {/* Main Content */}
@@ -126,11 +104,8 @@ const App: React.FC = () => {
                   <Route path="/events" element={<Events />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/contact" element={<ContactUs />} />
-
-                  {/* Village detail */}
                   <Route path="/village/:villageId" element={<VillageDetail />} />
                   <Route path="/story/:villageId" element={<StoryDetail />} />
-
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
