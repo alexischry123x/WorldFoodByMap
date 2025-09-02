@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, OverlayView } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, OverlayView, Polygon } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
-import { villageData } from "../data/villageData";
-import { useNavigate } from "react-router-dom";
 
-interface VillageMapEntry {
+interface Village {
   id: string;
   name: string;
   lat: number;
@@ -13,23 +11,41 @@ interface VillageMapEntry {
   url: string;
 }
 
-const coordsAndUrls: Record<string, { lat: number; lng: number; url: string }> = {
-  "Lefkara": { lat: 34.8667, lng: 33.3167, url: "/village/1" },
-  "Omodos": { lat: 34.8417, lng: 32.7333, url: "/village/2" },
-  "Kakopetria": { lat: 34.9833, lng: 32.9, url: "/village/3" },
-  "Platres": { lat: 34.9167, lng: 32.8667, url: "/village/4" },
-  "Lania": { lat: 34.8833, lng: 32.8, url: "/village/5" },
-};
+const villages: Village[] = [
+  { id: "1", name: "Lefkara", lat: 34.8667, lng: 33.3167, product: "Traditional Lace", url: "/products/lefkara" },
+  { id: "2", name: "Omodos", lat: 34.8417, lng: 32.7333, product: "Wine & Zivania", url: "/products/omodos" },
+  { id: "3", name: "Kakopetria", lat: 34.9833, lng: 32.9, product: "Honey & Preserves", url: "/products/kakopetria" },
+  { id: "4", name: "Platres", lat: 34.9167, lng: 32.8667, product: "Rose Products", url: "/products/platres" },
+  { id: "5", name: "Lania", lat: 34.8833, lng: 32.8, product: "Olive Oil", url: "/products/lania" },
+];
+
+interface Props {
+  onVillageClick: (village: Village) => void;
+}
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
 const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
 
-const GoogleMapsCyprus: React.FC = () => {
+// Approx polygon around Cyprus to create the “hole”
+const cyprusPolygon = [
+  { lat: 35.7, lng: 32.25 },
+  { lat: 35.7, lng: 34.75 },
+  { lat: 34.4, lng: 34.75 },
+  { lat: 34.4, lng: 32.25 },
+];
+
+const worldBoundsPolygon = [
+  { lat: 90, lng: -180 },
+  { lat: 90, lng: 180 },
+  { lat: -90, lng: 180 },
+  { lat: -90, lng: -180 },
+];
+
+const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -39,27 +55,6 @@ const GoogleMapsCyprus: React.FC = () => {
   }, []);
 
   const handleMapLoad = () => setMapLoaded(true);
-
-  // Compose villages array with lat/lng/url from coordsAndUrls and product/name/id from villageData
-  const villages: VillageMapEntry[] = Object.values(villageData)
-    .map((v) => {
-      const coord = coordsAndUrls[v.name];
-      if (!coord) return null;
-      return {
-        id: v.id.toString(),
-        name: v.name,
-        lat: coord.lat,
-        lng: coord.lng,
-        product: v.product,
-        url: coord.url,
-      };
-    })
-    .filter(Boolean) as VillageMapEntry[]; // filter out nulls
-
-  const onVillageClick = (village: VillageMapEntry) => {
-    // Navigate to village detail page using id param
-    navigate(`/village/${village.id}`);
-  };
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -78,6 +73,18 @@ const GoogleMapsCyprus: React.FC = () => {
           >
             {mapLoaded && window.google && (
               <>
+                {/* Grey overlay for the world except Cyprus */}
+                <Polygon
+                  paths={[worldBoundsPolygon, cyprusPolygon]}
+                  options={{
+                    fillColor: "#000000",
+                    fillOpacity: 0.4,
+                    strokeOpacity: 0,
+                    clickable: false,
+                  }}
+                />
+
+                {/* Villages */}
                 {villages.map((village) => {
                   const foodPin = {
                     url: "/logo.png",
@@ -108,12 +115,23 @@ const GoogleMapsCyprus: React.FC = () => {
                     </React.Fragment>
                   );
                 })}
+
+                {/* "Coming Soon" label outside Cyprus */}
+                <OverlayView
+                  position={{ lat: 36.0, lng: 31.0 }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div className="bg-black/60 text-white px-3 py-2 rounded-lg font-bold">
+                    Coming Soon 🌍
+                  </div>
+                </OverlayView>
               </>
             )}
           </GoogleMap>
         </LoadScript>
       </div>
 
+      {/* Buttons below the map */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
         {villages.map((village) => (
           <button
