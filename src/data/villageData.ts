@@ -72,6 +72,5 @@ export const villageData: Record<string, Village> = {
     story: 'These olive trees were planted by my great-grandfather. They know our family...',
     storyteller: 'Costas Michaelis, 74'
   }
-  },
   // Add more villages/products if you have them
 };
