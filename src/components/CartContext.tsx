@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export interface CartItem {
   id: string;
@@ -9,47 +9,55 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: Omit<CartItem, "quantity">) => void;
   removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    // ✅ Load from localStorage initially
-    const storedCart = localStorage.getItem("cart");
-    return storedCart ? JSON.parse(storedCart) : [];
-  });
+export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-  // ✅ Save to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-
-  const addToCart = (item: CartItem) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((i) => i.id === item.id);
+  // Add item or increase quantity if already exists
+  const addToCart = (item: Omit<CartItem, "quantity">) => {
+    setCart((prev) => {
+      const existing = prev.find((p) => p.id === item.id);
       if (existing) {
-        return prevCart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
         );
       }
-      return [...prevCart, item];
+      return [...prev, { ...item, quantity: 1 }];
     });
   };
 
+  // Remove item completely
   const removeFromCart = (id: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const clearCart = () => {
-    setCart([]);
+  // Update item quantity (removes if 0)
+  const updateQuantity = (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(id);
+    } else {
+      setCart((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    }
   };
+
+  // Clear basket
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );
