@@ -3,26 +3,27 @@ import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useCart } from "../components/CartContext";  // <-- import CartContext
+import { useCart } from "../components/CartContext";
 
 interface Props {
-  villageId: string;
+  productId: string;   // ✅ changed from villageId
+  productName: string; // ✅ added for clarity
   onBack: () => void;
 }
 
-const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
+const ProductPurchase: React.FC<Props> = ({ productId, productName, onBack }) => {
   const [quantity, setQuantity] = useState(1);
   const [email, setEmail] = useState('');
-  const { addToCart } = useCart(); // <-- get addToCart function
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
     addToCart({
-      id: villageId,
-      name: `Product from Village ${villageId}`,
-      price: 25,
+      id: productId,
+      name: productName,
+      price: 25, // ideally pass price as prop too
       quantity,
     });
-    alert(`Added ${quantity} item(s) to your basket!`);
+    alert(`Added ${quantity} ${productName}(s) to your basket!`);
   };
 
   const handlePurchase = () => {
@@ -39,7 +40,7 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
           className="mb-6 bg-white/80 hover:bg-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Village
+          Back to Products
         </Button>
 
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
