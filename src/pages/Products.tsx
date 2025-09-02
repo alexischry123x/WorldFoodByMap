@@ -1,35 +1,26 @@
 // src/pages/Products.tsx
-import React, { useState } from "react";
+import React from "react";
 import { villageData } from "../components/villageData";
-import ProductPurchase from "./ProductPurchase";
+import { Link } from "react-router-dom";
 
 const Products: React.FC = () => {
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-
-  if (selectedProductId) {
-    return (
-      <ProductPurchase
-        productId={selectedProductId}
-        onBack={() => setSelectedProductId(null)}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-green-800 mb-6">Products</h1>
+
         <div className="grid md:grid-cols-2 gap-6">
           {Object.values(villageData).map((village) => (
-            <div
+            <Link
               key={village.id}
-              onClick={() => setSelectedProductId(village.id)}
-              className="cursor-pointer bg-white/90 p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform"
+              to={`/village/${village.id}`}
+              className="bg-white/90 p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform"
             >
               <h2 className="text-2xl font-bold text-green-700">{village.product}</h2>
               <p className="text-gray-700">{village.name}</p>
               <p className="mt-2 text-gray-600">{village.description}</p>
-            </div>
+              <p className="mt-1 text-sm font-semibold text-green-600">Price: {village.price}</p>
+            </Link>
           ))}
         </div>
       </div>
