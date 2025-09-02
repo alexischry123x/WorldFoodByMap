@@ -12,11 +12,11 @@ interface Village {
 }
 
 const villages: Village[] = [
-  { id: "1", name: "Lefkara",     lat: 34.8667, lng: 33.3167, product: "Traditional Lace",   url: "/products/lefkara" },
-  { id: "2", name: "Omodos",      lat: 34.8417, lng: 32.7333, product: "Wine & Zivania",     url: "/products/omodos" },
-  { id: "3", name: "Kakopetria",  lat: 34.9833, lng: 32.9000, product: "Honey & Preserves",  url: "/products/kakopetria" },
-  { id: "4", name: "Platres",     lat: 34.9167, lng: 32.8667, product: "Rose Products",      url: "/products/platres" },
-  { id: "5", name: "Lania",       lat: 34.8833, lng: 32.8000, product: "Olive Oil",          url: "/products/lania" },
+  { id: "1", name: "Lefkara", lat: 34.8667, lng: 33.3167, product: "Traditional Lace", url: "/products/lefkara" },
+  { id: "2", name: "Omodos", lat: 34.8417, lng: 32.7333, product: "Wine & Zivania", url: "/products/omodos" },
+  { id: "3", name: "Kakopetria", lat: 34.9833, lng: 32.9000, product: "Honey & Preserves", url: "/products/kakopetria" },
+  { id: "4", name: "Platres", lat: 34.9167, lng: 32.8667, product: "Rose Products", url: "/products/platres" },
+  { id: "5", name: "Lania", lat: 34.8833, lng: 32.8000, product: "Olive Oil", url: "/products/lania" },
 ];
 
 interface Props {
@@ -24,8 +24,11 @@ interface Props {
 }
 
 const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
-const webCenter    = { lat: 35.0,  lng: 33.0  };
+const webCenter = { lat: 35.0, lng: 33.0 };
 const mobileCenter = { lat: 34.95, lng: 32.95 };
+
+// Helper function to reverse polygon coordinates to get counter-clockwise order
+const reverseCoords = (coords: { lat: number; lng: number }[]) => [...coords].reverse();
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -41,7 +44,8 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   const handleMapLoad = () => setMapLoaded(true);
 
-  // World bounding box
+  // Outer world boundary (must be clockwise for outer path)
+  // Use a polygon around the whole world (slightly inside bounds to avoid poles issue)
   const worldCoords = [
     { lat: 85, lng: -179.999 },
     { lat: 85, lng: 179.999 },
@@ -50,7 +54,8 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   ];
 
   // Approximate polygon of Cyprus island (simplified outline)
-  const cyprusCoords = [
+  // This must be a **hole**, hence coordinates reversed (counter-clockwise)
+  const cyprusCoordsRaw = [
     { lat: 35.1731, lng: 32.7312 },
     { lat: 35.1900, lng: 32.8500 },
     { lat: 35.2400, lng: 33.0500 },
@@ -64,8 +69,9 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
     { lat: 34.6500, lng: 33.6000 },
     { lat: 34.6000, lng: 33.3000 },
     { lat: 34.5634, lng: 32.7312 },
-    { lat: 35.1731, lng: 32.7312 },
+    { lat: 35.1731, lng: 32.7312 }, // close polygon
   ];
+  const cyprusCoords = reverseCoords(cyprusCoordsRaw);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -81,18 +87,26 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
             center={isMobile ? mobileCenter : webCenter}
             zoom={isMobile ? 9 : 10}
             onLoad={handleMapLoad}
+            options={{
+              styles: [], // keep default styling so Cyprus is colorful and normal
+              streetViewControl: false,
+              mapTypeControl: false,
+            }}
           >
             {mapLoaded && (window as any).google && (
               <>
-                {/* Grey overlay for rest of the world, with a HOLE over Cyprus */}
+                {/* Grey polygon over the whole world, with Cyprus as hole */}
+
                 <Polygon
-                  paths={[worldCoords, cyprusCoords]} // CY acts as a hole
+                  paths={[worldCoords, cyprusCoords]}
                   options={{
                     fillColor: "#808080",
                     fillOpacity: 0.6,
                     strokeOpacity: 0,
                     clickable: false,
-                    zIndex: 1,
+                    zIndex: 100,
+                    strokeColor: "#808080",
+                    strokeWeight: 0,
                   }}
                 />
 
