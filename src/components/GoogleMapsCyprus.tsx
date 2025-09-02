@@ -41,35 +41,31 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
 
   const handleMapLoad = () => setMapLoaded(true);
 
- const cyprusCoords = [
-  [
+  // Large rectangle covering the whole world
+  const worldCoords = [
+    { lat: 85, lng: -179.999 },
+    { lat: 85, lng: 179.999 },
+    { lat: -85, lng: 179.999 },
+    { lat: -85, lng: -179.999 },
+  ];
+
+  // Approximate polygon of Cyprus island (simplified shape)
+  const cyprusCoords = [
     { lat: 35.1731, lng: 32.7312 },
-    { lat: 35.1731, lng: 34.0049 },
-    { lat: 34.5634, lng: 34.0049 },
+    { lat: 35.1900, lng: 32.8500 },
+    { lat: 35.2400, lng: 33.0500 },
+    { lat: 35.2100, lng: 33.2500 },
+    { lat: 35.1700, lng: 33.4500 },
+    { lat: 35.1000, lng: 33.6500 },
+    { lat: 35.0500, lng: 33.8500 },
+    { lat: 35.0200, lng: 34.0049 },
+    { lat: 34.9000, lng: 34.0000 },
+    { lat: 34.7500, lng: 33.8500 },
+    { lat: 34.6500, lng: 33.6000 },
+    { lat: 34.6000, lng: 33.3000 },
     { lat: 34.5634, lng: 32.7312 },
-    { lat: 35.1731, lng: 32.7312 },
-  ],
-];
-
-// Outer world polygon (big rectangle)
-const worldCoords = [
-  { lat: 85, lng: -179.999 },
-  { lat: 85, lng: 179.999 },
-  { lat: -85, lng: 179.999 },
-  { lat: -85, lng: -179.999 },
-];
-
-// Polygon with a hole: world (CW) - Cyprus (CCW)
-<Polygon
-  paths={[worldCoords, cyprusCoords[0]]}
-  options={{
-    fillColor: "#808080",
-    fillOpacity: 0.5,
-    strokeOpacity: 0,
-    clickable: false,
-    zIndex: 1,
-  }}
-/>
+    { lat: 35.1731, lng: 32.7312 }, // back to start
+  ];
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -88,19 +84,19 @@ const worldCoords = [
           >
             {mapLoaded && (window as any).google && (
               <>
-                {/* Grey out the whole world EXCEPT the Cyprus box (hole) */}
+                {/* Grey out the whole world except the Cyprus polygon (hole) */}
                 <Polygon
-                  paths={[outerWorldCW, cyprusBoxCCW]}
+                  paths={[worldCoords, cyprusCoords]}
                   options={{
                     fillColor: "#808080",
-                    fillOpacity: 0.5,
+                    fillOpacity: 0.6,
                     strokeOpacity: 0,
                     clickable: false,
                     zIndex: 1,
                   }}
                 />
 
-                {/* Markers + hover tooltips */}
+                {/* Markers for villages */}
                 {villages.map((village) => {
                   const foodPin = {
                     url: "/logo.png",
