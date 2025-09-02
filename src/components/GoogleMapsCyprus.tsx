@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, OverlayView, Polygon } from "@react-google-maps/api";
+import React, { useState, useEffect, useRef } from "react";
+import { GoogleMap, LoadScript, Marker, OverlayView } from "@react-google-maps/api";
 import cyFlag from "../assets/cy.png";
 
 interface Village {
@@ -23,77 +23,55 @@ interface Props {
   onVillageClick: (village: Village) => void;
 }
 
-const containerStyle = { width: "100%", height: "600px", borderRadius: "1rem" };
-const center = { lat: 35.0, lng: 33.0 };
-const zoom = 10;
+const containerStyle = {
+  width: "100%",
+  height: "600px",
+  borderRadius: "1rem",
+  position: "relative",
+  overflow: "hidden",
+};
 
-// Cyprus polygon coordinates (simplified outline)
-const cyprusCoords = [
-  { lat: 35.1731, lng: 32.7312 },
-  { lat: 35.1900, lng: 32.8500 },
-  { lat: 35.2400, lng: 33.0500 },
-  { lat: 35.2100, lng: 33.2500 },
-  { lat: 35.1700, lng: 33.4500 },
-  { lat: 35.1000, lng: 33.6500 },
-  { lat: 35.0500, lng: 33.8500 },
-  { lat: 35.0200, lng: 34.0049 },
-  { lat: 34.9000, lng: 34.0000 },
-  { lat: 34.7500, lng: 33.8500 },
-  { lat: 34.6500, lng: 33.6000 },
-  { lat: 34.6000, lng: 33.3000 },
-  { lat: 34.5634, lng: 32.7312 },
-  { lat: 35.1731, lng: 32.7312 }, // close polygon
-];
+const fullWorldCenter = { lat: 20, lng: 0 }; // wide/global view
 
-// Desaturated map style - greyscale
+const cyprusCenter = { lat: 35.0, lng: 33.0 };
+const cyprusZoom = 10;
+
+// Desaturated map style (grey out)
 const grayMapStyle = [
-  { elementType: "geometry", stylers: [{ saturation: -100 }, { lightness: 50 }] },
-  { elementType: "labels.text.fill", stylers: [{ saturation: -100 }] },
-  { elementType: "labels.text.stroke", stylers: [{ saturation: -100 }] },
   {
-    featureType: "administrative.land_parcel",
-    elementType: "labels.text.fill",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "administrative.locality",
-    elementType: "labels.text.fill",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "transit",
-    elementType: "labels.text.fill",
-    stylers: [{ saturation: -100 }],
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ saturation: -100 }],
+    featureType: "all",
+    stylers: [{ saturation: -100 }, { lightness: 50 }],
   },
 ];
+
+// Simplified polygon outline of Cyprus (converted to CSS clip path POLYGON points)
+// We'll convert lat,lng to relative percentages for the container (approximate)
+const cyprusPolygonPointsCSS = [
+  [50, 20],
+  [52, 25],
+  [55, 33],
+  [53, 40],
+  [50, 48],
+  [45, 55],
+  [42, 60],
+  [40, 65],
+  [35, 65],
+  [30, 60],
+  [28, 50],
+  [27, 35],
+  [25, 20],
+];
+
+// Build CSS polygon string "x% y%, x% y%, ..."
+const clipPathPolygon = `polygon(${cyprusPolygonPointsCSS
+  .map((point) => `${point[0]}% ${point[1]}%`)
+  .join(", ")})`;
 
 const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
+
+  // Ref to colored map div for clip path
+  const topMapRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto">
@@ -102,57 +80,111 @@ const GoogleMapsCyprus: React.FC<Props> = ({ onVillageClick }) => {
         <span>Cyprus Food Map</span>
       </h1>
 
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+      <div style={containerStyle}>
+        {/* Bottom greyed-out world map */}
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={zoom}
+            mapContainerStyle={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+            center={fullWorldCenter}
+            zoom={2}
             options={{
-              styles: grayMapStyle, // Entire map is grey/desaturated
+              styles: grayMapStyle,
+              fullscreenControl: false,
               streetViewControl: false,
               mapTypeControl: false,
+              clickableIcons: false,
+              gestureHandling: "none", // disable pan/zoom on grey map
             }}
-          >
-            {/* Polygon of Cyprus colored to offset grey styling */}
-            <Polygon
-              paths={cyprusCoords}
-              options={{
-                fillColor: "#FFF3E0", // Light color to contrast with grey
-                fillOpacity: 0.6,
-                strokeColor: "#FF7043",
-                strokeWeight: 3,
-                zIndex: 1,
-              }}
-            />
-
-            {/* Village markers */}
-            {villages.map((village) => (
-              <React.Fragment key={village.id}>
-                <Marker
-                  position={{ lat: village.lat, lng: village.lng }}
-                  onClick={() => onVillageClick(village)}
-                  onMouseOver={() => setHoveredMarkerId(village.id)}
-                  onMouseOut={() => setHoveredMarkerId(null)}
-                />
-                {hoveredMarkerId === village.id && (
-                  <OverlayView
-                    position={{ lat: village.lat, lng: village.lng }}
-                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                  >
-                    <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
-                      <div className="font-bold">{village.product}</div>
-                      <div>{village.name}</div>
-                    </div>
-                  </OverlayView>
-                )}
-              </React.Fragment>
-            ))}
-          </GoogleMap>
+          />
         </LoadScript>
 
-        {/* "Coming soon" message */}
-        <div className="absolute top-3 right-3 bg-black/60 text-white px-3 py-1.5 rounded-md text-sm z-10">
+        {/* Top colored map clipped to Cyprus shape */}
+        <div
+          ref={topMapRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            clipPath: clipPathPolygon,
+            WebkitClipPath: clipPathPolygon,
+            pointerEvents: "auto", // enable interaction inside Cyprus
+            zIndex: 2,
+          }}
+        >
+          <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+            <GoogleMap
+              mapContainerStyle={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "1rem",
+              }}
+              center={cyprusCenter}
+              zoom={cyprusZoom}
+              options={{
+                fullscreenControl: false,
+                streetViewControl: false,
+                mapTypeControl: false,
+                zoomControl: true,
+                gestureHandling: "greedy", // allow zoom & pan inside Cyprus
+                restriction: {
+                  latLngBounds: {
+                    north: 35.6,
+                    south: 34.4,
+                    west: 32.5,
+                    east: 34.5,
+                  },
+                  strictBounds: false,
+                },
+              }}
+            >
+              {/* Markers */}
+              {villages.map((village) => (
+                <React.Fragment key={village.id}>
+                  <Marker
+                    position={{ lat: village.lat, lng: village.lng }}
+                    onClick={() => onVillageClick(village)}
+                    onMouseOver={() => setHoveredMarkerId(village.id)}
+                    onMouseOut={() => setHoveredMarkerId(null)}
+                  />
+                  {hoveredMarkerId === village.id && (
+                    <OverlayView
+                      position={{ lat: village.lat, lng: village.lng }}
+                      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                    >
+                      <div className="inline-block bg-white rounded-lg shadow-lg px-3 py-2 text-center min-w-max">
+                        <div className="font-bold">{village.product}</div>
+                        <div>{village.name}</div>
+                      </div>
+                    </OverlayView>
+                  )}
+                </React.Fragment>
+              ))}
+            </GoogleMap>
+          </LoadScript>
+        </div>
+
+        {/* Coming soon message */}
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            backgroundColor: "rgba(0,0,0,0.7)",
+            color: "white",
+            padding: "6px 12px",
+            borderRadius: "6px",
+            fontSize: "14px",
+            zIndex: 5,
+          }}
+        >
           🌍 Other countries coming soon…
         </div>
       </div>
