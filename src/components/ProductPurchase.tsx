@@ -1,43 +1,73 @@
-import React, { useState } from "react";
-import { useCart } from "./CartContext";
-import { Village } from "../data/VillageData";
+// src/pages/ProductPurchase.tsx
+import React, { useState } from 'react';
+import { ArrowLeft, CreditCard } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useCart } from "../components/CartContext";
+import { villageData } from "../components/villageData";
 
-interface ProductPurchaseProps {
-  village: Village;
+interface Props {
+  productId: string;
+  onBack: () => void;
 }
 
-const ProductPurchase: React.FC<ProductPurchaseProps> = ({ village }) => {
-  const { addToCart } = useCart();
+const ProductPurchase: React.FC<Props> = ({ productId, onBack }) => {
   const [quantity, setQuantity] = useState(1);
+  const [email, setEmail] = useState('');
+  const { addToCart } = useCart();
+
+  const village = villageData[productId];
+  if (!village) return <div>Product not found</div>;
 
   const handleAddToCart = () => {
-    const numericPrice = typeof village.price === "string"
-      ? parseFloat(village.price.replace("€", "").trim())
-      : village.price;
-
     addToCart({
       id: village.id,
       name: village.product,
-      price: numericPrice,
+      price: village.priceValue, // numeric
       quantity,
     });
+    alert(`Added ${quantity} × ${village.product} to your basket!`);
+  };
+
+  const handlePurchase = () => {
+    alert('Thank you! Your order has been placed.');
+    onBack();
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <input
-        type="number"
-        value={quantity}
-        min={1}
-        onChange={(e) => setQuantity(Number(e.target.value))}
-        className="w-16 border rounded px-2 py-1"
-      />
-      <button
-        onClick={handleAddToCart}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        Add to Basket
-      </button>
+    <div className="min-h-screen p-6 bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
+      <Button onClick={onBack} variant="outline" className="mb-6">← Back to Products</Button>
+      <div className="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-green-800 mb-6 text-center">🛒 {village.product}</h1>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <span>Quantity:</span>
+            <Input
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-20"
+            />
+          </div>
+          <div className="flex justify-between items-center font-semibold">
+            <span>Total:</span>
+            <span>€{(village.priceValue * quantity).toFixed(2)}</span>
+          </div>
+
+          <Label>Email:</Label>
+          <Input type="email" value={email} onChange={e => setEmail(e.target.value)} />
+
+          <Button onClick={handleAddToCart} className="w-full bg-green-500 hover:bg-green-600 text-white">
+            🛒 Add to Basket
+          </Button>
+
+          <Button onClick={handlePurchase} className="w-full bg-blue-500 hover:bg-blue-600 text-white" disabled={!email}>
+            <CreditCard className="mr-2 h-5 w-5"/> Complete Purchase
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
