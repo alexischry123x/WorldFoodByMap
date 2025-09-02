@@ -1,6 +1,6 @@
 // src/pages/Products.tsx
 import React from "react";
-import { villageData } from "../components/villageData";
+import { villageData } from "../data/villageData";
 import { Link } from "react-router-dom";
 
 const Products: React.FC = () => {
