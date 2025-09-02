@@ -7,7 +7,8 @@ export interface Village {
   villageInfo: string;
   population: number;
   district: string;
-  price: string;
+  price: string;       // original display string
+  priceValue: number;  // numeric value for calculations
   story: string;
   storyteller: string;
   fullStory: string;
@@ -26,6 +27,7 @@ export const villageData: Record<string, Village> = {
     district: 'Larnaca',
     description: 'Famous for its intricate handmade lace, a UNESCO recognized craft passed down through generations.',
     price: '€45-150',
+    priceValue: 45, // numeric value for calculations
     story: 'My grandmother taught me when I was just 8 years old. Each pattern tells a story of our village...',
     storyteller: 'Maria Constantinou, 78',
     fullStory: `I was just eight years old when my grandmother first placed the needle in my small hands. "Patience, my child," she would say, "each stitch carries the soul of our village."
@@ -48,9 +50,10 @@ Today, I teach my granddaughter the same way my grandmother taught me. When I se
     villageInfo: 'Omodos is a small village in Cyprus, in the Limassol district. It has a population of 300. Omodos is famous for their wine and zivania because this product has been made in Omodos since ancient times, with vineyards dating back over 1000 years in the Troodos Mountains.',
     population: 300,
     district: 'Limassol',
-    description: 'Traditional Cypriot wine and zivania (grape brandy) made from ancient vine varieties.',
+    description: 'Traditional Cypriot wine and zivania made from ancient vine varieties.',
     price: '€15-35',
-    story: 'Our family has been making wine for over 200 years. The secret is in the mountain soil...',
+    priceValue: 15,
+    story: 'Our family has been making wine for over 200 years...',
     storyteller: 'Andreas Kyprianou, 65',
     fullStory: `Our family vineyard sits on the slopes above Omodos, where the soil is rich with limestone and the mountain air carries the scent of wild herbs. My great-great-grandfather planted the first vines here in 1820, and we've been tending them ever since.
 
@@ -74,7 +77,8 @@ This isn't just a business for us - it's our connection to the land, to our ance
     district: 'Nicosia',
     description: 'Pure mountain honey and traditional fruit preserves made from local orchards.',
     price: '€8-25',
-    story: 'The bees know the best flowers in our mountains. This honey tastes like sunshine...',
+    priceValue: 8,
+    story: 'The bees know the best flowers in our mountains...',
     storyteller: 'Eleni Georgiou, 72',
     fullStory: `The bees in Kakopetria know secrets that we humans have forgotten. They know which wildflowers bloom at dawn, which herbs carry the sweetest nectar, and how to find the hidden springs that feed our mountain meadows.
 
@@ -98,6 +102,7 @@ Every jar we make carries the love of our family and the purity of our mountains
     district: 'Limassol',
     description: 'Rose water, oils, and cosmetics from the famous Platres mountain roses.',
     price: '€12-40',
+    priceValue: 12,
     story: 'Every morning at dawn, we pick roses when the dew is still fresh...',
     storyteller: 'Sophia Panayiotou, 69',
     fullStory: `Before sunrise, when the mountain mist still clings to the valleys, I walk among my roses. This is the sacred hour, when the petals hold the night's moisture and the fragrance is at its purest. My grandmother taught me this - "Pick roses like you're gathering prayers, child."
@@ -122,7 +127,8 @@ My roses have witnessed births, weddings, and farewells. They've comforted the s
     district: 'Limassol',
     description: 'Extra virgin olive oil from centuries-old olive groves in the Troodos mountains.',
     price: '€18-30',
-    story: 'These olive trees were planted by my great-grandfather. They know our family...',
+    priceValue: 18,
+    story: 'These olive trees were planted by my great-grandfather...',
     storyteller: 'Costas Michaelis, 74',
     fullStory: `These olive trees know my family better than I know myself. Some were planted by my great-great-grandfather in 1850, their gnarled trunks telling stories of droughts survived, storms weathered, and harvests celebrated through five generations.
 
