@@ -47,7 +47,7 @@ const villageData: Record<string, Village> = {
         { id: 'laceD', name: 'Lace D', price: 90, imageUrl: '/images/laceD.jpg' },
       ]
     }
-  }
+  },
   '2': {
     id: '2',
     name: 'Omodos',
