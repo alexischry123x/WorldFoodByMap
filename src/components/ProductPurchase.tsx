@@ -57,7 +57,10 @@ const ProductPurchase: React.FC<Props> = ({ villageId, onBack }) => {
                   type="number" 
                   min="1" 
                   value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setQuantity(isNaN(value) || value < 1 ? 1 : value);
+                    }}
                   className="w-20"
                 />
               </div>
