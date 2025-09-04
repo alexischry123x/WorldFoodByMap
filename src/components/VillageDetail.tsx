@@ -132,19 +132,19 @@ const villageData: Record<string, Village> = {
 };
 
 interface Props {
-  villageId?: string; // ✅ optional now
+  villageId?: string;   // make optional
   onBack?: () => void;
   onBuyProduct?: () => void;
   onReadStory?: () => void;
 }
 
 const VillageDetail: React.FC<Props> = ({ villageId: propVillageId, onBack, onBuyProduct, onReadStory }) => {
-  // ✅ grab id from URL if no prop provided
-  const { villageId: paramVillageId } = useParams<{ villageId: string }>();
-  const activeVillageId = propVillageId || paramVillageId;
+  const params = useParams<{ villageId: string }>();
+  const villageId = propVillageId || params.villageId; // fallback to URL param
 
-  const village = activeVillageId ? villageData[activeVillageId] : null;
-  if (!village) return <p className="p-6">Village not found</p>;
+  const village = villageId ? villageData[villageId] : undefined;
+
+  if (!village) return <p>Village not found</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 p-6">
