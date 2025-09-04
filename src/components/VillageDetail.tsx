@@ -132,22 +132,25 @@ const villageData: Record<string, Village> = {
 };
 
 interface Props {
-  villageId?: string; // make optional
+  villageId?: string; // ✅ optional now
   onBack?: () => void;
   onBuyProduct?: () => void;
   onReadStory?: () => void;
 }
 
 const VillageDetail: React.FC<Props> = ({ villageId: propVillageId, onBack, onBuyProduct, onReadStory }) => {
+  // ✅ grab id from URL if no prop provided
   const { villageId: paramVillageId } = useParams<{ villageId: string }>();
-  const villageId = propVillageId || paramVillageId; // ✅ fallback
+  const activeVillageId = propVillageId || paramVillageId;
 
-  const village = villageId ? villageData[villageId] : null;
-  if (!village) return <p>Village not found</p>;
+  const village = activeVillageId ? villageData[activeVillageId] : null;
+  if (!village) return <p className="p-6">Village not found</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 p-6">
       <div className="max-w-4xl mx-auto">
+        
+        {/* ✅ Back button ONLY if passed (map flow) */}
         {onBack && (
           <Button 
             onClick={onBack}
@@ -159,7 +162,71 @@ const VillageDetail: React.FC<Props> = ({ villageId: propVillageId, onBack, onBu
           </Button>
         )}
 
-        {/* ... the rest of your component unchanged ... */}
+        {/* === Your existing content goes here === */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-bold text-amber-800 mb-6">{village.name}</h1>
+            
+            {/* Village Info */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl mb-6 text-left">
+              <h2 className="text-2xl font-bold text-blue-800 mb-4">About {village.name}</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">{village.villageInfo}</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><strong>District:</strong> {village.district}</div>
+                <div><strong>Population:</strong> {village.population.toLocaleString()}</div>
+              </div>
+            </div>
+
+            {/* Product Info */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl mb-6">
+              <h2 className="text-2xl text-amber-600 font-semibold mb-3">{village.product}</h2>
+              <p className="text-gray-700 leading-relaxed text-lg">{village.description}</p>
+              <div className="mt-4 text-xl font-bold text-green-600">
+                Price Range: {village.price}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Sections */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl text-center">
+                <h3 className="text-xl font-bold text-green-800 mb-4">Purchase Product</h3>
+                <p className="text-gray-600 mb-4">
+                  Get authentic {village.product.toLowerCase()} directly from {village.name}
+                </p>
+                {onBuyProduct && (
+                  <Button 
+                    onClick={onBuyProduct}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg"
+                  >
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Buy This Product
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl">
+                <h3 className="text-xl font-bold text-blue-800 mb-3">Traditional Story</h3>
+                <p className="text-gray-700 italic leading-relaxed mb-3">"{village.story}"</p>
+                <p className="text-sm text-blue-600 font-medium mb-4">— {village.storyteller}</p>
+                
+                {onReadStory && (
+                  <Button 
+                    onClick={onReadStory}
+                    variant="outline"
+                    className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 py-3 text-lg"
+                  >
+                    <BookOpen className="mr-2 h-5 w-5" />
+                    Read Full Story
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
